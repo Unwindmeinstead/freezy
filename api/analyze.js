@@ -66,6 +66,32 @@ function normalizeCategory(category) {
   return allowed.has(category) ? category : 'Other';
 }
 
+function normalizeBox(box) {
+  if (!box || typeof box !== 'object') {
+    return null;
+  }
+  const x = Number(box.x);
+  const y = Number(box.y);
+  const w = Number(box.w);
+  const h = Number(box.h);
+  if (![x, y, w, h].every(Number.isFinite)) {
+    return null;
+  }
+  const clamped = {
+    x: Math.max(0, Math.min(1000, x)),
+    y: Math.max(0, Math.min(1000, y)),
+    w: Math.max(1, Math.min(1000, w)),
+    h: Math.max(1, Math.min(1000, h)),
+  };
+  if (clamped.x + clamped.w > 1000) {
+    clamped.w = 1000 - clamped.x;
+  }
+  if (clamped.y + clamped.h > 1000) {
+    clamped.h = 1000 - clamped.y;
+  }
+  return clamped.w > 0 && clamped.h > 0 ? clamped : null;
+}
+
 function normalizeResponse(payload) {
   const items = Array.isArray(payload?.items) ? payload.items : [];
   const uncertainItems = Array.isArray(payload?.uncertain_items) ? payload.uncertain_items : [];
@@ -83,6 +109,8 @@ function normalizeResponse(payload) {
       quantity: item.quantity || 'Visible in frame',
       expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
       confidence: clampConfidence(item.confidence, 0.85),
+      frame_index: Number.isInteger(item.frame_index) ? Math.max(0, Math.min(5, item.frame_index)) : 0,
+      box: normalizeBox(item.box),
     }))
     .filter((item) => item.confidence >= 0.72)
     .forEach((item) => {
@@ -151,7 +179,7 @@ export default async function handler(req) {
 
   try {
     const body = await req.json();
-    const { base64, frames, location } = body;
+    const { base64, frames, location, captureMode } = body;
     const normalizedFrames = Array.isArray(frames)
       ? frames.filter((frame) => typeof frame === 'string' && frame.length > 100).slice(0, 6)
       : [];
@@ -164,6 +192,11 @@ export default async function handler(req) {
     }
 
     const prompt = `You are analyzing ${normalizedFrames.length > 1 ? 'multiple frames from a sweep of' : 'a photo of'} a ${location} for a premium kitchen inventory app.
+
+Image notes:
+- Frame 0 is the canonical reference image for labeling when possible.
+- If additional images are present in photo mode, they are support crops from the same photo for reading labels and small objects.
+- If additional images are present in sweep mode, they are separate coverage views across the same space.
 
 Your first job is TRUST, not completeness.
 
@@ -178,6 +211,10 @@ Rules:
 - If a container is too blurry, occluded, too far away, or partially visible, do not promote it to confirmed inventory.
 - Put ambiguous detections into uncertain_items instead.
 - If there are several similar visible units, consolidate them into one item with an honest quantity estimate.
+- For each confirmed item, include "frame_index" for the frame where the item is best seen.
+- If the item is clearly visible in frame 0, include a "box" with normalized coordinates on frame 0 using a 0..1000 space:
+  { "x": left, "y": top, "w": width, "h": height }
+- If you cannot place the item reliably on frame 0, set "box" to null.
 - shopping suggestions must only come from clearly visible low stock, obvious emptiness, or clearly missing basics implied by visible meal ingredients. If that evidence is not strong, return an empty shopping array.
 - If the image quality is poor, it is acceptable to return zero confirmed items.
 
@@ -190,7 +227,9 @@ Return ONLY valid JSON with exactly this structure:
       "emoji": "single emoji",
       "quantity": "brief visible estimate",
       "expiry_concern": "none|soon|urgent",
-      "confidence": 0.0
+      "confidence": 0.0,
+      "frame_index": 0,
+      "box": { "x": 0, "y": 0, "w": 0, "h": 0 }
     }
   ],
   "uncertain_items": [
