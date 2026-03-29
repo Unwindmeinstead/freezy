@@ -35,6 +35,70 @@ function extractJsonObject(rawText) {
   }
 }
 
+function clampConfidence(value, fallback = 0) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) {
+    return fallback;
+  }
+  return Math.max(0, Math.min(1, num));
+}
+
+function normalizeCategory(category) {
+  const allowed = new Set([
+    'Dairy',
+    'Produce',
+    'Meat & Seafood',
+    'Beverages',
+    'Condiments & Sauces',
+    'Leftovers',
+    'Grains & Pantry',
+    'Snacks',
+    'Frozen',
+    'Other',
+  ]);
+  return allowed.has(category) ? category : 'Other';
+}
+
+function normalizeResponse(payload) {
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+  const uncertainItems = Array.isArray(payload?.uncertain_items) ? payload.uncertain_items : [];
+  const shopping = Array.isArray(payload?.shopping) ? payload.shopping : [];
+
+  return {
+    items: items
+      .filter((item) => item?.name)
+      .map((item) => ({
+        name: String(item.name).trim(),
+        category: normalizeCategory(item.category),
+        emoji: item.emoji || '📦',
+        quantity: item.quantity || 'Visible in frame',
+        expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
+        confidence: clampConfidence(item.confidence, 0.85),
+      }))
+      .filter((item) => item.confidence >= 0.72),
+    uncertain_items: uncertainItems
+      .filter((item) => item?.name)
+      .map((item) => ({
+        name: String(item.name).trim(),
+        emoji: item.emoji || '👀',
+        reason: item.reason || 'Visible, but too unclear to confirm',
+        confidence: clampConfidence(item.confidence, 0.4),
+      })),
+    shopping: shopping
+      .filter((item) => item?.name)
+      .map((item) => ({
+        name: String(item.name).trim(),
+        emoji: item.emoji || '🛒',
+        reason: item.reason || 'Suggested from visible low stock',
+      }))
+      .slice(0, 6),
+    summary: {
+      overview: payload?.summary?.overview || payload?.summary || '',
+      confidence_note: payload?.summary?.confidence_note || '',
+    },
+  };
+}
+
 export default async function handler(req) {
   if (req.method === 'OPTIONS') {
     return new Response(null, {
@@ -58,33 +122,59 @@ export default async function handler(req) {
       return jsonResponse({ error: 'Missing base64 or location' }, 400);
     }
 
-    const prompt = `You are analyzing a photo of a ${location}.
+    const prompt = `You are analyzing a photo of a ${location} for a premium kitchen inventory app.
 
-Identify ALL visible food and drink items. Return ONLY a valid JSON object — no markdown, no explanation — with exactly this structure:
+Your first job is TRUST, not completeness.
 
+Rules:
+- Only include items that are clearly and directly visible in the image.
+- Do NOT infer hidden items, likely groceries, or common household staples.
+- Do NOT guess based on context, shelf type, packaging color, or what "should" be in a ${location}.
+- If a container is too blurry, occluded, too far away, or partially visible, do not promote it to confirmed inventory.
+- Put ambiguous detections into uncertain_items instead.
+- shopping suggestions must only come from clearly visible low stock, obvious emptiness, or clearly missing basics implied by visible meal ingredients. If that evidence is not strong, return an empty shopping array.
+- If the image quality is poor, it is acceptable to return zero confirmed items.
+
+Return ONLY valid JSON with exactly this structure:
 {
   "items": [
     {
       "name": "item name",
-      "category": "Dairy|Produce|Meat & Seafood|Beverages|Condiments & Sauces|Leftovers|Grains & Pantry|Snacks|Other",
+      "category": "Dairy|Produce|Meat & Seafood|Beverages|Condiments & Sauces|Leftovers|Grains & Pantry|Snacks|Frozen|Other",
       "emoji": "single emoji",
-      "quantity": "e.g. '2 bottles', 'half-full carton', '1 bunch'",
-      "expiry_concern": "none|soon|urgent"
+      "quantity": "brief visible estimate",
+      "expiry_concern": "none|soon|urgent",
+      "confidence": 0.0
+    }
+  ],
+  "uncertain_items": [
+    {
+      "name": "possible item",
+      "emoji": "single emoji",
+      "reason": "why it is uncertain",
+      "confidence": 0.0
     }
   ],
   "shopping": [
-    { "name": "item", "emoji": "emoji" }
-  ]
+    {
+      "name": "item",
+      "emoji": "single emoji",
+      "reason": "why it was suggested from visible evidence"
+    }
+  ],
+  "summary": {
+    "overview": "one short sentence about what was confidently visible",
+    "confidence_note": "short sentence explaining overall scan confidence"
+  }
 }
 
-expiry_concern rules:
-- "none" = looks fresh / long shelf life
-- "soon" = might expire within a few days  
-- "urgent" = should be used today / tomorrow
+Confidence rules:
+- 0.90 to 1.00 = label/container is clearly identifiable
+- 0.75 to 0.89 = likely correct and visibly distinct
+- 0.50 to 0.74 = too uncertain for confirmed inventory; move to uncertain_items
+- below 0.50 = omit unless useful in uncertain_items
 
-shopping: suggest 4-6 common items that appear to be missing or running low.
-
-Return ONLY valid JSON.`;
+Return strict JSON only.`;
 
     const groqApiKey = process.env.GROQ_API_KEY;
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
@@ -98,7 +188,7 @@ Return ONLY valid JSON.`;
         },
         body: JSON.stringify({
           model: process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct',
-          temperature: 0.2,
+          temperature: 0,
           max_tokens: 1000,
           response_format: { type: 'json_object' },
           messages: [{
@@ -122,7 +212,7 @@ Return ONLY valid JSON.`;
 
       const data = await groqRes.json();
       const raw = data.choices?.[0]?.message?.content || '{}';
-      return jsonResponse(extractJsonObject(raw), 200);
+      return jsonResponse(normalizeResponse(extractJsonObject(raw)), 200);
     }
 
     if (anthropicApiKey) {
@@ -157,7 +247,7 @@ Return ONLY valid JSON.`;
 
       const data = await anthropicRes.json();
       const raw = data.content?.[0]?.text || '{}';
-      return jsonResponse(extractJsonObject(raw), 200);
+      return jsonResponse(normalizeResponse(extractJsonObject(raw)), 200);
     }
 
     return jsonResponse({

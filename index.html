@@ -4,264 +4,465 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Freezy</title>
-  <meta name="theme-color" content="#08080f">
+  <meta name="theme-color" content="#efe7db">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#08080f;--surface:#0f0f1a;--surface-2:#161624;--surface-3:#1e1e2e;
-      --border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.12);
-      --accent:#00e0a0;--accent-dim:rgba(0,224,160,0.1);--accent-glow:rgba(0,224,160,0.25);
-      --warn:#ffb347;--danger:#ff5f5f;--text:#ebebf5;--text-2:#8888aa;--text-3:#555570;
-      --mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;--r:14px;--r-sm:10px;
+    :root{
+      --bg:#efe7db;
+      --bg-deep:#d7ccb9;
+      --ink:#17161a;
+      --ink-soft:#58545d;
+      --line:rgba(23,22,26,0.1);
+      --line-strong:rgba(23,22,26,0.18);
+      --paper:rgba(255,252,247,0.82);
+      --paper-strong:#fffaf2;
+      --panel:#f7f0e6;
+      --shadow:0 20px 60px rgba(43,31,16,0.12);
+      --accent:#0e7a5f;
+      --accent-2:#1d9375;
+      --accent-soft:rgba(14,122,95,0.12);
+      --warn:#cb7a18;
+      --warn-soft:rgba(203,122,24,0.14);
+      --danger:#c44e3b;
+      --danger-soft:rgba(196,78,59,0.14);
+      --sans:'Manrope',sans-serif;
+      --display:'Space Grotesk',sans-serif;
+      --r-xl:32px;
+      --r-lg:24px;
+      --r-md:18px;
+      --r-sm:14px;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
-    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 40% at 50% -10%,rgba(0,224,160,0.06) 0%,transparent 60%);pointer-events:none;z-index:0}
-    #app{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;position:relative;z-index:1}
-    header{height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border)}
-    .logo{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase}
-    .logo-fridge{color:var(--accent)}.logo-ai{color:var(--text-3)}
-    .header-right{display:flex;gap:8px;align-items:center}
-    .loc-pill{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,224,160,0.2);padding:4px 10px;border-radius:20px}
-    .icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);transition:all 0.15s;flex-shrink:0}
-    .icon-btn:active{transform:scale(0.9);color:var(--accent)}
-    .tab-bar{display:flex;padding:10px 20px;gap:8px;flex-shrink:0}
-    .tab{flex:1;height:38px;border-radius:19px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px}
-    .tab.active{background:var(--accent-dim);border-color:rgba(0,224,160,0.35);color:var(--accent)}
-    .content{flex:1;overflow-y:auto;padding:4px 20px 140px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    html,body{min-height:100%;background:
+      radial-gradient(circle at top left, rgba(255,255,255,0.8), transparent 28%),
+      radial-gradient(circle at top right, rgba(14,122,95,0.08), transparent 30%),
+      linear-gradient(180deg, var(--bg) 0%, #ece1d1 100%);
+      color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+    body{overflow:hidden}
+    button,input{font:inherit}
+    #app{height:100dvh;max-width:430px;margin:0 auto;padding:18px 16px 24px;display:flex;flex-direction:column;gap:14px;position:relative}
+    .topbar,.hero,.stats,.section,.action-bar,.sheet,.camera-top,.camera-bottom,.review-card,.result-card,.shopping-card,.empty-state,.uncertain-card,.scan-card{
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+    }
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 4px 2px}
+    .brand{display:flex;flex-direction:column;gap:2px}
+    .brand-mark{font:700 15px var(--display);letter-spacing:0.14em;text-transform:uppercase}
+    .brand-mark span{color:var(--accent)}
+    .brand-sub{font-size:11px;color:var(--ink-soft);letter-spacing:0.04em}
+    .topbar-actions{display:flex;gap:10px;align-items:center}
+    .status-pill,.top-btn,.summary-badge,.tab,.method-btn,.icon-chip,.mini-stat,.scan-trigger,.utility-btn,.pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,0.48);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .status-pill{padding:10px 14px;border-radius:999px;font-size:12px;color:var(--ink-soft)}
+    .top-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--ink);transition:transform .18s ease,border-color .18s ease,background .18s ease}
+    .top-btn:active,.tab:active,.method-btn:active,.scan-trigger:active,.utility-btn:active{transform:scale(.97)}
+    .hero{background:linear-gradient(145deg, rgba(255,250,242,0.88), rgba(249,240,229,0.78));border:1px solid rgba(255,255,255,0.75);box-shadow:var(--shadow);border-radius:var(--r-xl);padding:22px 20px 18px;position:relative;overflow:hidden}
+    .hero::after{content:'';position:absolute;inset:auto -30px -60px auto;width:180px;height:180px;background:radial-gradient(circle, rgba(14,122,95,0.16), transparent 66%);pointer-events:none}
+    .hero-kicker{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .eyebrow{font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft)}
+    .hero h1{margin-top:8px;font:700 34px/0.96 var(--display);letter-spacing:-0.04em;max-width:260px}
+    .hero p{margin-top:12px;font-size:14px;line-height:1.55;color:var(--ink-soft);max-width:290px}
+    .hero-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+    .summary-badge{border-radius:999px;padding:8px 12px;font-size:12px;color:var(--ink)}
+    .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .tab{border-radius:22px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s ease}
+    .tab.active{background:var(--ink);color:#fff;border-color:var(--ink);box-shadow:0 12px 28px rgba(23,22,26,0.14)}
+    .tab-label{font-size:12px;font-weight:700;letter-spacing:0.02em}
+    .tab-sub{font-size:11px;margin-top:3px;opacity:.72}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .mini-stat{border-radius:22px;padding:14px 12px}
+    .mini-stat-value{font:700 26px/1 var(--display)}
+    .mini-stat-label{margin-top:6px;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.08em}
+    .content{flex:1;overflow:auto;padding-bottom:140px;scrollbar-width:none}
     .content::-webkit-scrollbar{display:none}
-    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;text-align:center;padding:40px 0}
-    .empty-icon{width:100px;height:100px;border-radius:28px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:4px}
-    .empty-state h2{font-size:18px;font-weight:600;color:var(--text)}
-    .empty-state p{font-size:13px;color:var(--text-2);max-width:220px;line-height:1.55}
-    .scan-preview-wrap{margin-top:14px}
-    .scan-preview{width:100%;border-radius:var(--r);max-height:150px;object-fit:cover;border:1px solid var(--border);display:block}
-    .scan-meta{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:0.1em;padding:5px 2px 10px;text-transform:uppercase}
-    .rescan-btn{width:100%;height:36px;border-radius:18px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-family:var(--sans);font-size:12px;cursor:pointer;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s}
-    .rescan-btn:active{border-color:var(--accent);color:var(--accent)}
-    .category{margin-top:18px}
-    .cat-header{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);padding:6px 0 8px;display:flex;align-items:center;gap:7px}
-    .cat-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
-    .item-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:7px;animation:slideIn 0.2s ease both}
-    @keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    .item-emoji{font-size:20px;width:32px;text-align:center;flex-shrink:0}
-    .item-info{flex:1;min-width:0}
-    .item-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .item-qty{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-top:1px}
-    .expiry-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:500;flex-shrink:0;letter-spacing:0.05em}
-    .ex-soon{background:rgba(255,179,71,0.12);color:var(--warn);border:1px solid rgba(255,179,71,0.25)}
-    .ex-urgent{background:rgba(255,95,95,0.12);color:var(--danger);border:1px solid rgba(255,95,95,0.25)}
-    .del-btn{width:26px;height:26px;border-radius:50%;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all 0.15s;flex-shrink:0}
-    .del-btn:active{background:rgba(255,95,95,0.15);color:var(--danger);border-color:rgba(255,95,95,0.4)}
-    .add-row{border:1px dashed var(--border-2);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer;color:var(--text-3);font-size:12px;transition:all 0.15s}
-    .add-row:active{border-color:var(--accent);color:var(--accent)}
-    .add-input-row{display:flex;gap:8px;margin-bottom:7px}
-    .add-input{flex:1;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none}
-    .add-input::placeholder{color:var(--text-3)}
-    .add-ok{width:42px;flex-shrink:0;background:var(--accent);border:none;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#08080f}
-    .shop-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--border)}
-    .section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-2);margin-bottom:10px}
-    .shop-item{display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;transition:opacity 0.2s}
-    .shop-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--border-2);cursor:pointer;transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .shop-check.checked{background:var(--accent);border-color:var(--accent)}
-    .shop-name{font-size:13px;color:var(--text);flex:1}
-    .shop-del{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:2px;transition:color 0.15s}
-    .shop-del:active{color:var(--danger)}
-    .fab-wrap{position:absolute;bottom:0;left:0;right:0;padding:12px 20px 36px;background:linear-gradient(to top,var(--bg) 55%,transparent);pointer-events:none}
-    .fab{width:100%;height:54px;border-radius:27px;background:var(--accent);color:#08080f;font-family:var(--sans);font-size:15px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;pointer-events:all;transition:all 0.2s;box-shadow:0 0 32px var(--accent-glow);letter-spacing:0.02em}
-    .fab:active{transform:scale(0.97);box-shadow:0 0 14px var(--accent-glow)}
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.25s}
-    .overlay.open{opacity:1;pointer-events:all}
-    .sheet{width:100%;max-width:430px;background:var(--surface-2);border-radius:24px 24px 0 0;padding:20px 20px 44px;transform:translateY(30px);transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1);border-top:1px solid var(--border)}
+    .section{background:rgba(255,250,242,0.7);border:1px solid rgba(255,255,255,0.72);border-radius:28px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+    .section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
+    .section-title{font:700 18px/1.1 var(--display)}
+    .section-copy{font-size:12px;color:var(--ink-soft);line-height:1.5;margin-top:4px}
+    .scan-card{background:linear-gradient(180deg, rgba(255,255,255,0.72), rgba(248,239,228,0.9));border:1px solid var(--line);border-radius:24px;padding:14px}
+    .preview-frame{aspect-ratio:4/3;width:100%;border-radius:20px;overflow:hidden;background:linear-gradient(140deg, #efe4d3, #dfd1bf);border:1px solid rgba(23,22,26,0.06);display:flex;align-items:center;justify-content:center;position:relative}
+    .preview-frame img{width:100%;height:100%;object-fit:cover;display:block}
+    .preview-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center}
+    .preview-orb{width:72px;height:72px;border-radius:24px;background:linear-gradient(145deg, rgba(14,122,95,0.16), rgba(14,122,95,0.04));display:grid;place-items:center;font-size:32px}
+    .preview-empty strong{font-size:18px}
+    .preview-empty span{font-size:13px;line-height:1.5;color:var(--ink-soft);max-width:230px}
+    .scan-meta{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+    .scan-meta-text{font-size:12px;color:var(--ink-soft)}
+    .method-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    .method-btn{border-radius:18px;padding:14px;text-align:left;cursor:pointer;transition:all .2s ease}
+    .method-btn.active{border-color:rgba(14,122,95,0.3);background:var(--accent-soft)}
+    .method-title{font-weight:700;font-size:14px}
+    .method-copy{font-size:12px;color:var(--ink-soft);margin-top:4px;line-height:1.45}
+    .pill-row{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{border-radius:999px;padding:7px 10px;font-size:11px;color:var(--ink-soft)}
+    .result-grid,.shopping-list,.uncertain-list{display:grid;gap:10px}
+    .result-card,.shopping-card,.uncertain-card,.review-card{background:rgba(255,255,255,0.58);border:1px solid var(--line);border-radius:20px;padding:14px}
+    .result-card{display:flex;align-items:flex-start;gap:12px}
+    .result-icon,.shopping-icon,.uncertain-icon{width:42px;height:42px;border-radius:16px;background:rgba(255,255,255,0.72);display:grid;place-items:center;font-size:22px;flex-shrink:0}
+    .result-main{flex:1;min-width:0}
+    .result-top{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .result-name{font-size:15px;font-weight:700}
+    .result-qty,.result-meta,.review-copy,.uncertain-copy,.shopping-copy{font-size:12px;color:var(--ink-soft);line-height:1.45}
+    .result-qty{margin-top:4px}
+    .result-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+    .icon-chip{border-radius:999px;padding:5px 8px;font-size:11px}
+    .chip-soon{background:var(--warn-soft);border-color:rgba(203,122,24,0.2);color:var(--warn)}
+    .chip-urgent{background:var(--danger-soft);border-color:rgba(196,78,59,0.2);color:var(--danger)}
+    .chip-confident{background:var(--accent-soft);border-color:rgba(14,122,95,0.18);color:var(--accent)}
+    .utility-btn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--ink-soft);flex-shrink:0}
+    .review-card{display:flex;align-items:flex-start;gap:12px;background:linear-gradient(180deg, rgba(14,122,95,0.08), rgba(14,122,95,0.04))}
+    .review-icon{width:44px;height:44px;border-radius:16px;background:rgba(14,122,95,0.14);display:grid;place-items:center;font-size:20px;flex-shrink:0}
+    .shopping-card,.uncertain-card{display:flex;gap:12px;align-items:flex-start}
+    .shopping-name{font-weight:700;font-size:14px}
+    .shopping-copy,.uncertain-copy{margin-top:3px}
+    .shopping-check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line-strong);display:grid;place-items:center;cursor:pointer;flex-shrink:0;margin-top:11px}
+    .shopping-check.checked{background:var(--ink);border-color:var(--ink);color:#fff}
+    .shopping-card.checked{opacity:.45}
+    .empty-state{border:1px dashed var(--line-strong);border-radius:24px;padding:26px 18px;text-align:center;background:rgba(255,255,255,0.38)}
+    .empty-state h2{font:700 22px/1.05 var(--display)}
+    .empty-state p{margin-top:10px;font-size:13px;color:var(--ink-soft);line-height:1.55}
+    .action-bar{position:absolute;left:16px;right:16px;bottom:18px;background:rgba(255,249,241,0.8);border:1px solid rgba(255,255,255,0.8);border-radius:28px;padding:12px;display:grid;grid-template-columns:1fr auto;gap:10px;box-shadow:0 18px 40px rgba(55,41,23,0.12)}
+    .scan-trigger{border:none;border-radius:20px;background:linear-gradient(135deg, var(--ink) 0%, #2a2a31 100%);color:#fff;padding:16px 18px;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:700;cursor:pointer}
+    .scan-trigger svg{flex-shrink:0}
+    .share-trigger{width:56px;border:none;border-radius:20px;background:rgba(255,255,255,0.72);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer}
+    .overlay,.camera-modal,.analyzing{position:fixed;inset:0;z-index:100;opacity:0;pointer-events:none;transition:opacity .22s ease}
+    .overlay.open,.camera-modal.open,.analyzing.open{opacity:1;pointer-events:auto}
+    .overlay{background:rgba(16,14,12,0.4);display:flex;align-items:flex-end;justify-content:center;padding:14px}
+    .sheet{width:min(430px,100%);background:rgba(255,250,242,0.9);border:1px solid rgba(255,255,255,0.8);border-radius:30px;padding:18px;box-shadow:var(--shadow);transform:translateY(24px);transition:transform .28s ease}
     .overlay.open .sheet{transform:translateY(0)}
-    .handle{width:34px;height:4px;border-radius:2px;background:var(--surface-3);margin:0 auto 18px}
-    .sheet-title{font-size:16px;font-weight:600;text-align:center;margin-bottom:20px;color:var(--text)}
-    .capture-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .cap-opt{background:var(--surface-3);border:1px solid var(--border);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s}
-    .cap-opt:active{border-color:var(--accent);background:var(--accent-dim)}
-    .cap-opt-icon{font-size:34px;margin-bottom:6px}
-    .cap-opt-label{font-size:14px;font-weight:500;color:var(--text)}
-    .cap-opt-sub{font-size:11px;color:var(--text-3);margin-top:3px}
-    .camera-modal{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.2s}
-    .camera-modal.open{opacity:1;pointer-events:all}
-    .cam-view{flex:1;position:relative;overflow:hidden}
+    .sheet-handle{width:42px;height:5px;border-radius:999px;background:rgba(23,22,26,0.12);margin:0 auto 16px}
+    .sheet-title{font:700 22px/1 var(--display)}
+    .sheet-copy{font-size:13px;color:var(--ink-soft);line-height:1.55;margin-top:8px}
+    .sheet-grid{display:grid;gap:10px;margin-top:18px}
+    .camera-modal{background:#111;display:flex;flex-direction:column}
+    .camera-view{flex:1;position:relative}
     #videoEl{width:100%;height:100%;object-fit:cover;display:block}
-    .cam-top{position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
-    .cam-close{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:white}
-    .rec-badge{display:none;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:#fff;background:rgba(255,95,95,0.8);padding:4px 10px;border-radius:20px}
-    .rec-badge.on{display:flex}
-    .rec-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite}
-    @keyframes blink{50%{opacity:0}}
-    .cam-bottom{position:absolute;bottom:0;left:0;right:0;padding:20px 24px 48px}
-    .cam-hint{text-align:center;font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--mono);margin-bottom:20px;letter-spacing:0.05em}
-    .cam-controls{display:flex;align-items:center;justify-content:center;gap:48px}
-    .shutter{width:68px;height:68px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,0.35);cursor:pointer;transition:all 0.12s;outline:none}
-    .shutter.rec{background:var(--danger);border-color:rgba(255,95,95,0.4)}
-    .shutter:active{transform:scale(0.9)}
-    .analyzing{position:fixed;inset:0;background:rgba(8,8,15,0.96);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
-    .analyzing.open{opacity:1;pointer-events:all}
-    .spin-wrap{width:110px;height:110px;position:relative;display:flex;align-items:center;justify-content:center}
-    .spin-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--surface-3)}
-    .spin-ring::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;border-top-color:var(--accent);animation:spin 0.9s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .spin-emoji{font-size:44px}
-    .analyzing-label{font-family:var(--mono);font-size:12px;color:var(--text-2);letter-spacing:0.12em}
-    .analyzing-sub{font-size:11px;color:var(--text-3);font-family:var(--mono);letter-spacing:0.08em}
-    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface-2);border:1px solid var(--border-2);border-radius:20px;padding:9px 18px;font-size:13px;color:var(--text);z-index:500;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none}
+    .camera-top,.camera-bottom{position:absolute;left:0;right:0;padding:20px}
+    .camera-top{top:0;display:flex;justify-content:space-between;align-items:center}
+    .camera-bottom{bottom:0}
+    .camera-chip,.cam-close,.shutter,.analyzing-shell,.toast{box-shadow:0 18px 40px rgba(0,0,0,0.22)}
+    .camera-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.18);color:#fff;font-size:12px}
+    .cam-close{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.34);color:#fff;cursor:pointer}
+    .camera-hint{color:rgba(255,255,255,0.86);font-size:14px;line-height:1.45;max-width:280px}
+    .camera-sub{margin-top:8px;color:rgba(255,255,255,0.6);font-size:12px}
+    .camera-controls{display:flex;align-items:center;justify-content:center;margin-top:18px}
+    .shutter{width:78px;height:78px;border-radius:50%;border:6px solid rgba(255,255,255,0.3);background:#fff;cursor:pointer;transition:transform .16s ease,background .16s ease}
+    .shutter.rec{background:var(--danger);border-color:rgba(255,255,255,0.22)}
+    .analyzing{display:grid;place-items:center;background:rgba(21,17,14,0.54);padding:22px}
+    .analyzing-shell{width:min(360px,100%);border-radius:30px;background:rgba(255,250,242,0.9);border:1px solid rgba(255,255,255,0.82);padding:26px 22px;text-align:center}
+    .scan-radar{width:104px;height:104px;border-radius:32px;background:linear-gradient(145deg, rgba(14,122,95,0.16), rgba(14,122,95,0.04));margin:0 auto 18px;display:grid;place-items:center;font-size:42px;position:relative}
+    .scan-radar::after{content:'';position:absolute;inset:-10px;border-radius:38px;border:1px solid rgba(14,122,95,0.18);animation:pulse 1.5s ease infinite}
+    @keyframes pulse{0%{transform:scale(.92);opacity:.2}70%{transform:scale(1.08);opacity:.7}100%{transform:scale(1.15);opacity:0}}
+    .analyzing-title{font:700 24px/1 var(--display)}
+    .analyzing-copy{margin-top:10px;font-size:13px;color:var(--ink-soft);line-height:1.55}
+    .toast{position:fixed;left:50%;bottom:108px;transform:translateX(-50%) translateY(16px);background:rgba(27,24,22,0.9);color:#fff;padding:12px 16px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:all .2s ease;z-index:500;max-width:calc(100vw - 32px);text-align:center}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     #captureCanvas{display:none}
+    @media (min-width:700px){
+      body{overflow:auto}
+      #app{height:auto;min-height:100dvh;padding-bottom:120px}
+      .action-bar{left:50%;right:auto;transform:translateX(-50%);width:min(430px,calc(100vw - 32px))}
+    }
   </style>
 </head>
 <body>
 <div id="app">
-  <header>
-    <div class="logo"><span class="logo-fridge">freezy</span><span class="logo-ai">.ai</span></div>
-    <div class="header-right">
-      <div class="loc-pill" id="locPill">Fridge</div>
-      <button class="icon-btn" id="shareBtn" title="Share list">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">free<span>zy</span></div>
+      <div class="brand-sub">Inventory intelligence for real kitchens</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="status-pill" id="locPill">Fridge</div>
+      <button class="top-btn" id="shareBtn" title="Share list" aria-label="Share list">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
           <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
       </button>
     </div>
-  </header>
-  <div class="tab-bar">
-    <button class="tab active" data-loc="fridge">🧊 Fridge</button>
-    <button class="tab" data-loc="freezer">❄️ Freezer</button>
-    <button class="tab" data-loc="pantry">🥫 Pantry</button>
   </div>
-  <div class="content" id="content"></div>
-  <div class="fab-wrap">
-    <button class="fab" id="scanBtn">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+
+  <section class="hero">
+    <div class="hero-kicker">
+      <div>
+        <div class="eyebrow">Household OS</div>
+        <h1 id="heroTitle">See what is actually there.</h1>
+        <p id="heroCopy">Freezy scans your kitchen storage and turns it into a clean inventory you can trust, edit, and share.</p>
+      </div>
+      <div class="summary-badge" id="heroBadge">No scan yet</div>
+    </div>
+    <div class="hero-meta">
+      <div class="summary-badge" id="summaryBadge">Confidence-first scan logic</div>
+      <div class="summary-badge" id="summaryTimestamp">Ready for a new capture</div>
+    </div>
+  </section>
+
+  <div class="tabs">
+    <button class="tab active" data-loc="fridge">
+      <div class="tab-label">Fridge</div>
+      <div class="tab-sub">Fresh food</div>
+    </button>
+    <button class="tab" data-loc="freezer">
+      <div class="tab-label">Freezer</div>
+      <div class="tab-sub">Long-term</div>
+    </button>
+    <button class="tab" data-loc="pantry">
+      <div class="tab-label">Pantry</div>
+      <div class="tab-sub">Dry goods</div>
+    </button>
+  </div>
+
+  <section class="stats">
+    <div class="mini-stat">
+      <div class="mini-stat-value" id="itemsStat">0</div>
+      <div class="mini-stat-label">Confirmed Items</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-value" id="reviewStat">0</div>
+      <div class="mini-stat-label">Needs Review</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-value" id="shoppingStat">0</div>
+      <div class="mini-stat-label">Shopping Notes</div>
+    </div>
+  </section>
+
+  <main class="content" id="content"></main>
+
+  <div class="action-bar">
+    <button class="scan-trigger" id="scanBtn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+        <path d="M4 7h3l2-3h6l2 3h3a2 2 0 0 1 2 2v8a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V9a2 2 0 0 1 2-2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
-      Scan Now
+      Scan Current Space
+    </button>
+    <button class="share-trigger" id="shareBtnBottom" title="Share list" aria-label="Share list">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/>
+        <path d="M12 16V3"/>
+        <path d="m7 8 5-5 5 5"/>
+      </svg>
     </button>
   </div>
 </div>
 
 <div class="overlay" id="captureOverlay">
   <div class="sheet">
-    <div class="handle"></div>
-    <div class="sheet-title">How do you want to scan?</div>
-    <div class="capture-grid">
-      <div class="cap-opt" id="photoOpt">
-        <div class="cap-opt-icon">📷</div>
-        <div class="cap-opt-label">Photo</div>
-        <div class="cap-opt-sub">Quick snap</div>
-      </div>
-      <div class="cap-opt" id="videoOpt">
-        <div class="cap-opt-icon">🎥</div>
-        <div class="cap-opt-label">Video</div>
-        <div class="cap-opt-sub">Sweep around</div>
-      </div>
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Capture with intention</div>
+    <div class="sheet-copy">Use photo for a shelf or drawer. Use video mode if you need a slow sweep across a fuller space.</div>
+    <div class="sheet-grid">
+      <button class="method-btn active" id="photoOpt">
+        <div class="method-title">Photo capture</div>
+        <div class="method-copy">Fastest option. Best when the camera sees the whole shelf in one frame.</div>
+      </button>
+      <button class="method-btn" id="videoOpt">
+        <div class="method-title">Sweep capture</div>
+        <div class="method-copy">Same single-frame scan today, but optimized for a steadier pan before capture.</div>
+      </button>
     </div>
   </div>
 </div>
 
 <div class="camera-modal" id="cameraModal">
-  <div class="cam-view">
+  <div class="camera-view">
     <video id="videoEl" autoplay playsinline muted></video>
     <canvas id="captureCanvas"></canvas>
-    <div class="cam-top">
-      <button class="cam-close" id="camClose">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+    <div class="camera-top">
+      <button class="cam-close" id="camClose" aria-label="Close camera">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
-      <div class="rec-badge" id="recBadge"><div class="rec-dot"></div> REC</div>
-      <div style="width:40px"></div>
+      <div class="camera-chip" id="cameraChip">Photo mode</div>
     </div>
-    <div class="cam-bottom">
-      <div class="cam-hint" id="camHint"></div>
-      <div class="cam-controls">
-        <div style="width:40px"></div>
-        <button class="shutter" id="shutterBtn"></button>
-        <div style="width:40px"></div>
+    <div class="camera-bottom">
+      <div class="camera-hint" id="camHint"></div>
+      <div class="camera-sub" id="camSubHint"></div>
+      <div class="camera-controls">
+        <button class="shutter" id="shutterBtn" aria-label="Capture"></button>
       </div>
     </div>
   </div>
 </div>
 
 <div class="analyzing" id="analyzingOverlay">
-  <div class="spin-wrap">
-    <div class="spin-ring"></div>
-    <div class="spin-emoji" id="spinEmoji">🧊</div>
+  <div class="analyzing-shell">
+    <div class="scan-radar" id="spinEmoji">🧊</div>
+    <div class="analyzing-title">Building a trustworthy inventory</div>
+    <div class="analyzing-copy" id="analyzingCopy">Only clearly visible items should be promoted into inventory. Ambiguous detections stay in review.</div>
   </div>
-  <div class="analyzing-label">Analyzing contents...</div>
-  <div class="analyzing-sub">Powered by Claude Vision</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const state={loc:'fridge',data:{fridge:{cats:{},shopping:[],preview:null},freezer:{cats:{},shopping:[],preview:null},pantry:{cats:{},shopping:[],preview:null}},captureMode:'photo',stream:null,isRecording:false};
+const state={
+  loc:'fridge',
+  captureMode:'photo',
+  stream:null,
+  isRecording:false,
+  data:{
+    fridge:blankLocationState(),
+    freezer:blankLocationState(),
+    pantry:blankLocationState()
+  }
+};
+
+function blankLocationState(){
+  return {
+    items:[],
+    shopping:[],
+    uncertain_items:[],
+    preview:null,
+    scannedAt:null,
+    summary:'',
+    scanConfidence:'Awaiting scan'
+  };
+}
+
 const $=id=>document.getElementById(id);
-const content=$('content'),captureOverlay=$('captureOverlay'),cameraModal=$('cameraModal'),analyzingOverlay=$('analyzingOverlay'),videoEl=$('videoEl'),canvas=$('captureCanvas'),toast=$('toast'),recBadge=$('recBadge'),shutterBtn=$('shutterBtn'),camHint=$('camHint'),locPill=$('locPill'),spinEmoji=$('spinEmoji');
-const LOC_META={fridge:{label:'Fridge',emoji:'🧊'},freezer:{label:'Freezer',emoji:'❄️'},pantry:{label:'Pantry',emoji:'🥫'}};
+const content=$('content');
+const captureOverlay=$('captureOverlay');
+const cameraModal=$('cameraModal');
+const analyzingOverlay=$('analyzingOverlay');
+const videoEl=$('videoEl');
+const canvas=$('captureCanvas');
+const toast=$('toast');
+const shutterBtn=$('shutterBtn');
+const camHint=$('camHint');
+const camSubHint=$('camSubHint');
+const cameraChip=$('cameraChip');
+const locPill=$('locPill');
+const spinEmoji=$('spinEmoji');
+const heroTitle=$('heroTitle');
+const heroCopy=$('heroCopy');
+const heroBadge=$('heroBadge');
+const summaryBadge=$('summaryBadge');
+const summaryTimestamp=$('summaryTimestamp');
+const analyzingCopy=$('analyzingCopy');
+const itemsStat=$('itemsStat');
+const reviewStat=$('reviewStat');
+const shoppingStat=$('shoppingStat');
+
+const LOC_META={
+  fridge:{label:'Fridge',emoji:'🧊',headline:'Cold storage, clearly mapped.'},
+  freezer:{label:'Freezer',emoji:'❄️',headline:'Frozen inventory with less guesswork.'},
+  pantry:{label:'Pantry',emoji:'🥫',headline:'Dry goods, visible and organized.'}
+};
+
 function curData(){return state.data[state.loc]}
+
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     state.loc=tab.dataset.loc;
-    locPill.textContent=LOC_META[state.loc].label;
-    spinEmoji.textContent=LOC_META[state.loc].emoji;
     render();
   });
 });
+
 $('scanBtn').addEventListener('click',openCaptureModal);
 $('shareBtn').addEventListener('click',shareList);
+$('shareBtnBottom').addEventListener('click',shareList);
+
 function openCaptureModal(){captureOverlay.classList.add('open')}
 function closeCaptureModal(){captureOverlay.classList.remove('open')}
 captureOverlay.addEventListener('click',e=>{if(e.target===captureOverlay)closeCaptureModal()});
-$('photoOpt').addEventListener('click',()=>{closeCaptureModal();state.captureMode='photo';startCamera()});
-$('videoOpt').addEventListener('click',()=>{closeCaptureModal();state.captureMode='video';startCamera()});
+
+$('photoOpt').addEventListener('click',()=>{
+  setCaptureMode('photo');
+  closeCaptureModal();
+  startCamera();
+});
+
+$('videoOpt').addEventListener('click',()=>{
+  setCaptureMode('video');
+  closeCaptureModal();
+  startCamera();
+});
+
+function setCaptureMode(mode){
+  state.captureMode=mode;
+  $('photoOpt').classList.toggle('active',mode==='photo');
+  $('videoOpt').classList.toggle('active',mode==='video');
+}
+
 async function startCamera(){
   try{
-    state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    state.stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
+      audio:false
+    });
     videoEl.srcObject=state.stream;
-    camHint.textContent=state.captureMode==='photo'?`Point at your ${state.loc} and tap`:`Tap to start recording`;
-    shutterBtn.classList.remove('rec');
     state.isRecording=false;
-    recBadge.classList.remove('on');
+    shutterBtn.classList.remove('rec');
+    cameraChip.textContent=state.captureMode==='photo'?'Photo mode':'Sweep mode';
+    camHint.textContent=state.captureMode==='photo'
+      ? `Frame only the visible area of your ${state.loc}. Avoid distant or dark shelves.`
+      : `Start a slow sweep, then tap again to capture the clearest final frame.`;
+    camSubHint.textContent=state.captureMode==='photo'
+      ? 'Large labels and full containers scan best.'
+      : 'Move deliberately. Blurry video still produces bad inventory.';
     cameraModal.classList.add('open');
-  }catch(err){showToast('⚠️ Camera access denied');console.error(err)}
+  }catch(err){
+    showToast('Camera access is required to scan');
+    console.error(err);
+  }
 }
+
 function stopCamera(){
-  if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null}
+  if(state.stream){
+    state.stream.getTracks().forEach(track=>track.stop());
+    state.stream=null;
+  }
   videoEl.srcObject=null;
   cameraModal.classList.remove('open');
-  recBadge.classList.remove('on');
   shutterBtn.classList.remove('rec');
   state.isRecording=false;
 }
+
 $('camClose').addEventListener('click',stopCamera);
 shutterBtn.addEventListener('click',()=>{
-  if(state.captureMode==='photo'){captureFrame()}
-  else{
-    if(!state.isRecording){state.isRecording=true;shutterBtn.classList.add('rec');recBadge.classList.add('on');camHint.textContent=`Slowly pan across your ${state.loc}... tap to finish`}
-    else{captureFrame()}
+  if(state.captureMode==='photo'){
+    captureFrame();
+    return;
   }
+  if(!state.isRecording){
+    state.isRecording=true;
+    shutterBtn.classList.add('rec');
+    camHint.textContent=`Sweep across your ${state.loc}, then tap again when the clearest frame is visible.`;
+    camSubHint.textContent='Freezy will only use the captured frame, not the whole video.';
+    return;
+  }
+  captureFrame();
 });
+
 function captureFrame(){
-  const w=videoEl.videoWidth||1280,h=videoEl.videoHeight||720;
-  canvas.width=w;canvas.height=h;
+  const w=videoEl.videoWidth||1280;
+  const h=videoEl.videoHeight||720;
+  canvas.width=w;
+  canvas.height=h;
   canvas.getContext('2d').drawImage(videoEl,0,0);
-  const fullBase64=canvas.toDataURL('image/jpeg',0.7).split(',')[1];
-  const preview=canvas.toDataURL('image/jpeg',0.35);
+  const fullBase64=canvas.toDataURL('image/jpeg',0.78).split(',')[1];
+  const preview=canvas.toDataURL('image/jpeg',0.42);
   stopCamera();
   analyzeImage(fullBase64,preview);
 }
+
 async function analyzeImage(base64,preview){
   analyzingOverlay.classList.add('open');
+  analyzingCopy.textContent=`Scanning your ${state.loc} with a strict confidence filter. Unclear items should stay out of the inventory.`;
   const loc=state.loc;
   try{
     const res=await fetch('/api/analyze',{
@@ -277,92 +478,384 @@ async function analyzeImage(base64,preview){
         errMsg=errJson.detail||errJson.error||errMsg;
       }catch{}
       console.error('API error:',res.status,errText);
-      showToast('⚠️ '+errMsg);
+      showToast(errMsg);
       analyzingOverlay.classList.remove('open');
       return;
     }
+
     const parsed=await res.json();
     const d=state.data[loc];
-    d.preview=preview;d.cats={};d.shopping=parsed.shopping||[];
-    (parsed.items||[]).forEach(item=>{
-      const cat=item.category||'Other';
-      if(!d.cats[cat])d.cats[cat]=[];
-      d.cats[cat].push({...item});
-    });
-    if(!Object.keys(d.cats).length)showToast("Couldn't find items — try better lighting");
-  }catch(err){console.error('Fetch error:',err);showToast('⚠️ Network error — check connection')}
+    d.preview=preview;
+    d.items=Array.isArray(parsed.items)?parsed.items.map(normalizeItem):[];
+    d.shopping=Array.isArray(parsed.shopping)?parsed.shopping.map(normalizeShoppingItem):[];
+    d.uncertain_items=Array.isArray(parsed.uncertain_items)?parsed.uncertain_items.map(normalizeUncertainItem):[];
+    d.summary=parsed.summary?.overview||parsed.summary||'';
+    d.scanConfidence=parsed.summary?.confidence_note||buildConfidenceLabel(d.items,d.uncertain_items);
+    d.scannedAt=new Date().toISOString();
+
+    if(!d.items.length && !d.uncertain_items.length){
+      showToast("Nothing reliable detected. Try closer framing and better light.");
+    }else if(d.uncertain_items.length){
+      showToast(`Scan complete. ${d.uncertain_items.length} item${d.uncertain_items.length===1?'':'s'} need review.`);
+    }else{
+      showToast('Scan complete');
+    }
+  }catch(err){
+    console.error('Fetch error:',err);
+    showToast('Network error. Check connection and try again.');
+  }
   analyzingOverlay.classList.remove('open');
   render();
 }
+
+function normalizeItem(item){
+  return {
+    name:item?.name||'Unknown item',
+    category:item?.category||'Other',
+    emoji:item?.emoji||'📦',
+    quantity:item?.quantity||'Visible in frame',
+    expiry_concern:item?.expiry_concern||'none',
+    confidence:clampConfidence(item?.confidence)
+  };
+}
+
+function normalizeShoppingItem(item){
+  return {
+    name:item?.name||'Suggested item',
+    emoji:item?.emoji||'🛒',
+    reason:item?.reason||'Suggested from visible low stock'
+  };
+}
+
+function normalizeUncertainItem(item){
+  return {
+    name:item?.name||'Possible item',
+    emoji:item?.emoji||'👀',
+    reason:item?.reason||'Not clear enough to promote into inventory',
+    confidence:clampConfidence(item?.confidence)
+  };
+}
+
+function clampConfidence(value){
+  const num=Number(value);
+  if(Number.isFinite(num)) return Math.max(0,Math.min(1,num));
+  return 0;
+}
+
+function buildConfidenceLabel(items,uncertain){
+  if(!items.length && !uncertain.length) return 'Low confidence';
+  if(uncertain.length) return 'Review suggested';
+  return 'High confidence';
+}
+
 function render(){
   const d=curData();
-  const cats=Object.keys(d.cats);
-  if(!cats.length){
-    content.innerHTML=`<div class="empty-state"><div class="empty-icon">${LOC_META[state.loc].emoji}</div><h2>Nothing scanned yet</h2><p>Tap Scan Now to photograph your ${state.loc} and get an instant inventory</p></div>`;
-    return;
+  const meta=LOC_META[state.loc];
+  locPill.textContent=meta.label;
+  spinEmoji.textContent=meta.emoji;
+  heroTitle.textContent=meta.headline;
+  heroCopy.textContent=d.summary||`Scan your ${state.loc} and Freezy will only surface items it can clearly justify from the image.`;
+  heroBadge.textContent=d.scannedAt?`${d.items.length} confirmed`:'No scan yet';
+  summaryBadge.textContent=d.scanConfidence||'Awaiting scan';
+  summaryTimestamp.textContent=d.scannedAt?`Last scan ${formatTimestamp(d.scannedAt)}`:'Ready for a new capture';
+  itemsStat.textContent=String(d.items.length);
+  reviewStat.textContent=String(d.uncertain_items.length);
+  shoppingStat.textContent=String(d.shopping.length);
+
+  const html=[];
+  html.push(renderScanSection(d,meta));
+
+  if(!d.items.length && !d.uncertain_items.length && !d.shopping.length){
+    html.push(`
+      <section class="section">
+        <div class="empty-state">
+          <div class="preview-orb">${meta.emoji}</div>
+          <h2>No inventory yet</h2>
+          <p>Take a close, well-lit scan of your ${state.loc}. Freezy now defaults to under-reporting instead of inventing items.</p>
+        </div>
+      </section>
+    `);
+  }else{
+    if(d.summary || d.uncertain_items.length){
+      html.push(renderReviewSection(d));
+    }
+    if(d.items.length){
+      html.push(renderInventorySection(d));
+    }
+    if(d.uncertain_items.length){
+      html.push(renderUncertainSection(d));
+    }
+    if(d.shopping.length){
+      html.push(renderShoppingSection(d));
+    }
   }
-  let html='';
-  if(d.preview)html+=`<div class="scan-preview-wrap"><img src="${d.preview}" class="scan-preview" alt="Scan"><div class="scan-meta">⟳ Last scan · ${LOC_META[state.loc].label}</div></div>`;
-  html+=`<button class="rescan-btn" onclick="openCaptureModal()">📷 Scan again</button>`;
-  cats.forEach(cat=>{
-    const catKey=cat.replace(/[^a-z0-9]/gi,'_');
-    html+=`<div class="category"><div class="cat-header"><div class="cat-dot"></div>${escHtml(cat)}</div>`;
-    d.cats[cat].forEach((item,idx)=>{
-      let badge='';
-      if(item.expiry_concern==='soon')badge=`<span class="expiry-badge ex-soon">USE SOON</span>`;
-      if(item.expiry_concern==='urgent')badge=`<span class="expiry-badge ex-urgent">USE NOW</span>`;
-      html+=`<div class="item-card"><span class="item-emoji">${item.emoji||'🍽️'}</span><div class="item-info"><div class="item-name">${escHtml(item.name)}</div>${item.quantity?`<div class="item-qty">${escHtml(item.quantity)}</div>`:''}</div>${badge}<button class="del-btn" onclick="deleteItem('${escHtml(cat)}',${idx})"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
-    });
-    html+=`<div class="add-row" id="addrow_${catKey}" onclick="showAddInput('${escHtml(cat)}','${catKey}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add to ${escHtml(cat)}</div></div>`;
-  });
-  if(d.shopping.length){
-    html+=`<div class="shop-section"><div class="section-label">🛒 Shopping List</div>`;
-    d.shopping.forEach((item,i)=>{
-      html+=`<div class="shop-item" id="shoprow_${i}"><div class="shop-check" id="shopchk_${i}" onclick="toggleShop(${i})"></div><span style="font-size:18px">${item.emoji||'🛒'}</span><span class="shop-name">${escHtml(item.name)}</span><button class="shop-del" onclick="deleteShop(${i})">×</button></div>`;
-    });
-    html+=`</div>`;
-  }
-  content.innerHTML=html;
+
+  content.innerHTML=html.join('');
 }
-function deleteItem(cat,idx){const d=curData();if(!d.cats[cat])return;d.cats[cat].splice(idx,1);if(!d.cats[cat].length)delete d.cats[cat];render()}
-function showAddInput(cat,catKey){
-  const row=document.getElementById('addrow_'+catKey);if(!row)return;
-  const inputId='addinp_'+catKey;
-  row.outerHTML=`<div class="add-input-row"><input class="add-input" id="${inputId}" placeholder="Item name..." autocomplete="off"><button class="add-ok" onclick="confirmAdd('${escHtml(cat)}','${catKey}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></div>`;
-  const inp=document.getElementById(inputId);
-  if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')confirmAdd(cat,catKey)})}
+
+function renderScanSection(d,meta){
+  return `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Current capture</div>
+          <div class="section-copy">Preview the latest image, tune the scan method, and rescan when the framing is better.</div>
+        </div>
+        <div class="pill-row">
+          <div class="pill">${meta.label}</div>
+          <div class="pill">${state.captureMode==='photo'?'Photo mode':'Sweep mode'}</div>
+        </div>
+      </div>
+      <div class="scan-card">
+        <div class="preview-frame">
+          ${d.preview
+            ? `<img src="${d.preview}" alt="Latest scan preview">`
+            : `<div class="preview-empty"><div class="preview-orb">${meta.emoji}</div><strong>No capture yet</strong><span>Use a tighter shot so the model sees labels, containers, and shelf boundaries clearly.</span></div>`
+          }
+        </div>
+        <div class="scan-meta">
+          <div class="scan-meta-text">${d.scannedAt?`Captured ${formatTimestamp(d.scannedAt)}`:'Nothing captured yet'}</div>
+          <div class="pill">${d.scanConfidence||'Awaiting scan'}</div>
+        </div>
+        <div class="method-row">
+          <button class="method-btn ${state.captureMode==='photo'?'active':''}" onclick="setCaptureMode('photo');render();">
+            <div class="method-title">Photo scan</div>
+            <div class="method-copy">Best for one shelf or one drawer at a time.</div>
+          </button>
+          <button class="method-btn ${state.captureMode==='video'?'active':''}" onclick="setCaptureMode('video');render();">
+            <div class="method-title">Sweep scan</div>
+            <div class="method-copy">Use when you need a steadier final frame before capture.</div>
+          </button>
+        </div>
+      </div>
+    </section>
+  `;
 }
-function confirmAdd(cat,catKey){
-  const inp=document.getElementById('addinp_'+catKey);
-  const val=inp?inp.value.trim():'';
-  if(val){const d=curData();if(!d.cats[cat])d.cats[cat]=[];d.cats[cat].push({name:val,category:cat,emoji:'🍽️',quantity:'',expiry_concern:'none'})}
+
+function renderReviewSection(d){
+  return `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Scan review</div>
+          <div class="section-copy">The product should earn trust by being explicit about uncertainty.</div>
+        </div>
+      </div>
+      <div class="review-card">
+        <div class="review-icon">✦</div>
+        <div>
+          <div class="result-name">Confidence note</div>
+          <div class="review-copy">${escHtml(d.summary || d.scanConfidence || 'No summary available.')}</div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderInventorySection(d){
+  return `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Confirmed inventory</div>
+          <div class="section-copy">Only items the model considered clearly visible should appear here.</div>
+        </div>
+        <div class="pill">${d.items.length} item${d.items.length===1?'':'s'}</div>
+      </div>
+      <div class="result-grid">
+        ${d.items.map((item,idx)=>`
+          <div class="result-card">
+            <div class="result-icon">${escHtml(item.emoji)}</div>
+            <div class="result-main">
+              <div class="result-top">
+                <div class="result-name">${escHtml(item.name)}</div>
+                <button class="utility-btn" onclick="deleteItem(${idx})" aria-label="Delete item">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="result-qty">${escHtml(item.quantity)}</div>
+              <div class="result-meta">
+                <div class="icon-chip">${escHtml(item.category)}</div>
+                <div class="icon-chip chip-confident">${Math.round(item.confidence*100)||85}% confidence</div>
+                ${item.expiry_concern==='soon'?'<div class="icon-chip chip-soon">Use soon</div>':''}
+                ${item.expiry_concern==='urgent'?'<div class="icon-chip chip-urgent">Use now</div>':''}
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderUncertainSection(d){
+  return `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Needs review</div>
+          <div class="section-copy">Ambiguous detections stay out of the main inventory until you verify them.</div>
+        </div>
+        <div class="pill">${d.uncertain_items.length} flagged</div>
+      </div>
+      <div class="uncertain-list">
+        ${d.uncertain_items.map((item,idx)=>`
+          <div class="uncertain-card">
+            <div class="uncertain-icon">${escHtml(item.emoji)}</div>
+            <div class="result-main">
+              <div class="result-top">
+                <div class="result-name">${escHtml(item.name)}</div>
+                <div class="icon-chip">${Math.round(item.confidence*100)||40}% confidence</div>
+              </div>
+              <div class="uncertain-copy">${escHtml(item.reason)}</div>
+            </div>
+            <button class="utility-btn" onclick="promoteUncertainItem(${idx})" aria-label="Promote item">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderShoppingSection(d){
+  return `
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <div class="section-title">Shopping cues</div>
+          <div class="section-copy">Suggestions should come from visible low stock, not generic fridge assumptions.</div>
+        </div>
+      </div>
+      <div class="shopping-list">
+        ${d.shopping.map((item,idx)=>`
+          <div class="shopping-card ${item.checked?'checked':''}" id="shoprow_${idx}">
+            <div class="shopping-check ${item.checked?'checked':''}" onclick="toggleShop(${idx})" id="shopchk_${idx}">
+              ${item.checked?`<svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`:''}
+            </div>
+            <div class="shopping-icon">${escHtml(item.emoji)}</div>
+            <div class="result-main">
+              <div class="shopping-name">${escHtml(item.name)}</div>
+              <div class="shopping-copy">${escHtml(item.reason)}</div>
+            </div>
+            <button class="utility-btn" onclick="deleteShop(${idx})" aria-label="Delete shopping item">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function deleteItem(idx){
+  curData().items.splice(idx,1);
   render();
 }
-function toggleShop(i){
-  const chk=document.getElementById('shopchk_'+i),row=document.getElementById('shoprow_'+i);if(!chk)return;
-  const on=chk.classList.toggle('checked');
-  chk.innerHTML=on?`<svg width="9" height="9" fill="none" stroke="#08080f" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`:'';
-  if(row)row.style.opacity=on?'0.35':'1';
-}
-function deleteShop(i){curData().shopping.splice(i,1);render()}
-function shareList(){
-  const d=curData();const cats=Object.keys(d.cats);
-  if(!cats.length){showToast('Nothing to share yet');return}
-  const label=LOC_META[state.loc].label;
-  let text=`${LOC_META[state.loc].emoji} ${label} Contents\n${'─'.repeat(24)}\n\n`;
-  cats.forEach(cat=>{
-    text+=`${cat}\n`;
-    d.cats[cat].forEach(item=>{const qty=item.quantity?` · ${item.quantity}`:'';const flag=item.expiry_concern==='urgent'?' ⚠️':item.expiry_concern==='soon'?' 🕐':'';text+=`  ${item.emoji} ${item.name}${qty}${flag}\n`});
-    text+='\n';
+
+function promoteUncertainItem(idx){
+  const d=curData();
+  const item=d.uncertain_items.splice(idx,1)[0];
+  if(!item) return;
+  d.items.unshift({
+    name:item.name,
+    category:'Other',
+    emoji:item.emoji||'📦',
+    quantity:'Manually confirmed',
+    expiry_concern:'none',
+    confidence:Math.max(item.confidence||0,.65)
   });
-  if(d.shopping.length){text+=`🛒 Shopping List\n`;d.shopping.forEach(item=>text+=`  ${item.emoji} ${item.name}\n`)}
-  if(navigator.share)navigator.share({title:'Freezy',text});
-  else navigator.clipboard.writeText(text).then(()=>showToast('📋 Copied!')).catch(()=>showToast('⚠️ Could not copy'));
+  showToast('Moved to confirmed inventory');
+  render();
 }
+
+function toggleShop(idx){
+  const item=curData().shopping[idx];
+  if(!item) return;
+  item.checked=!item.checked;
+  render();
+}
+
+function deleteShop(idx){
+  curData().shopping.splice(idx,1);
+  render();
+}
+
+function shareList(){
+  const d=curData();
+  if(!d.items.length && !d.shopping.length && !d.uncertain_items.length){
+    showToast('Nothing to share yet');
+    return;
+  }
+  const meta=LOC_META[state.loc];
+  let text=`${meta.emoji} ${meta.label} Inventory\n\n`;
+  if(d.items.length){
+    text+='Confirmed inventory\n';
+    d.items.forEach(item=>{
+      const qty=item.quantity?` · ${item.quantity}`:'';
+      text+=`- ${item.emoji} ${item.name}${qty}\n`;
+    });
+    text+='\n';
+  }
+  if(d.uncertain_items.length){
+    text+='Needs review\n';
+    d.uncertain_items.forEach(item=>{
+      text+=`- ${item.emoji} ${item.name} (${item.reason})\n`;
+    });
+    text+='\n';
+  }
+  if(d.shopping.length){
+    text+='Shopping cues\n';
+    d.shopping.forEach(item=>{
+      text+=`- ${item.emoji} ${item.name}${item.reason?` (${item.reason})`:''}\n`;
+    });
+  }
+  if(navigator.share){
+    navigator.share({title:'Freezy',text}).catch(()=>{});
+  }else{
+    navigator.clipboard.writeText(text)
+      .then(()=>showToast('Inventory copied'))
+      .catch(()=>showToast('Could not copy inventory'));
+  }
+}
+
+function formatTimestamp(iso){
+  try{
+    return new Date(iso).toLocaleString([],{
+      month:'short',
+      day:'numeric',
+      hour:'numeric',
+      minute:'2-digit'
+    });
+  }catch{
+    return 'recently';
+  }
+}
+
 let toastTimer;
-function showToast(msg,ms=2800){clearTimeout(toastTimer);toast.textContent=msg;toast.classList.add('show');toastTimer=setTimeout(()=>toast.classList.remove('show'),ms)}
-function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-Object.assign(window,{openCaptureModal,deleteItem,showAddInput,confirmAdd,toggleShop,deleteShop});
+function showToast(msg,ms=2800){
+  clearTimeout(toastTimer);
+  toast.textContent=msg;
+  toast.classList.add('show');
+  toastTimer=setTimeout(()=>toast.classList.remove('show'),ms);
+}
+
+function escHtml(s){
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+Object.assign(window,{setCaptureMode,openCaptureModal,deleteItem,promoteUncertainItem,toggleShop,deleteShop});
 render();
 </script>
 </body>
