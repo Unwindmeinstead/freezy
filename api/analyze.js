@@ -47,7 +47,64 @@ function normalizeName(value) {
   return String(value || '')
     .trim()
     .toLowerCase()
+    .replace(/[()]/g, ' ')
+    .replace(/['’]/g, '')
+    .replace(/[^a-z0-9+\s/&-]/g, ' ')
     .replace(/\s+/g, ' ');
+}
+
+function singularizeWord(word) {
+  if (word.endsWith('berries')) {
+    return `${word.slice(0, -7)}berry`;
+  }
+  if (word.endsWith('ies') && word.length > 4) {
+    return `${word.slice(0, -3)}y`;
+  }
+  if (word.endsWith('s') && !word.endsWith('ss') && word.length > 3) {
+    return word.slice(0, -1);
+  }
+  return word;
+}
+
+function canonicalizeName(value) {
+  const stopWords = new Set([
+    'the', 'a', 'an', 'brand', 'style', 'assorted', 'mixed', 'variety',
+    'organic', 'fresh', 'large', 'small', 'medium', 'pack', 'package',
+    'bottle', 'jar', 'container', 'carton', 'box', 'bag', 'bags', 'can', 'cans'
+  ]);
+  return normalizeName(value)
+    .split(' ')
+    .map((word) => singularizeWord(word))
+    .filter((word) => word && !stopWords.has(word))
+    .join(' ');
+}
+
+function tokenSet(value) {
+  return new Set(canonicalizeName(value).split(' ').filter(Boolean));
+}
+
+function namesLookEquivalent(a, b) {
+  const aCanon = canonicalizeName(a);
+  const bCanon = canonicalizeName(b);
+  if (!aCanon || !bCanon) {
+    return false;
+  }
+  if (aCanon === bCanon || aCanon.includes(bCanon) || bCanon.includes(aCanon)) {
+    return true;
+  }
+  const aTokens = tokenSet(a);
+  const bTokens = tokenSet(b);
+  if (!aTokens.size || !bTokens.size) {
+    return false;
+  }
+  let overlap = 0;
+  aTokens.forEach((token) => {
+    if (bTokens.has(token)) {
+      overlap += 1;
+    }
+  });
+  const minSize = Math.min(aTokens.size, bTokens.size);
+  return overlap >= Math.max(1, minSize - 1);
 }
 
 function normalizeCategory(category) {
@@ -64,6 +121,68 @@ function normalizeCategory(category) {
     'Other',
   ]);
   return allowed.has(category) ? category : 'Other';
+}
+
+function pickEmoji(name, category) {
+  const normalized = canonicalizeName(name);
+  const has = (term) => normalized.includes(term);
+  if (category === 'Produce') {
+    if (has('apple')) return '🍎';
+    if (has('banana')) return '🍌';
+    if (has('berry') || has('strawberry') || has('blueberry')) return '🫐';
+    if (has('grape')) return '🍇';
+    if (has('orange') || has('clementine')) return '🍊';
+    if (has('lemon') || has('lime')) return '🍋';
+    if (has('avocado')) return '🥑';
+    if (has('carrot')) return '🥕';
+    if (has('tomato')) return '🍅';
+    if (has('pepper')) return '🫑';
+    if (has('salad') || has('lettuce') || has('spinach')) return '🥬';
+    return '🥦';
+  }
+  if (category === 'Dairy') {
+    if (has('egg')) return '🥚';
+    if (has('milk')) return '🥛';
+    if (has('cheese')) return '🧀';
+    if (has('butter')) return '🧈';
+    if (has('yogurt')) return '🥣';
+    return '🧀';
+  }
+  if (category === 'Meat & Seafood') {
+    if (has('shrimp') || has('fish') || has('salmon') || has('tuna')) return '🐟';
+    if (has('bacon')) return '🥓';
+    return '🍗';
+  }
+  if (category === 'Beverages') {
+    if (has('water')) return '💧';
+    if (has('juice')) return '🧃';
+    if (has('soda') || has('cola')) return '🥤';
+    if (has('milk')) return '🥛';
+    return '🥤';
+  }
+  if (category === 'Condiments & Sauces') {
+    if (has('ketchup')) return '🍅';
+    if (has('mustard')) return '🌭';
+    if (has('mayo') || has('mayonnaise')) return '🥄';
+    if (has('hot sauce') || has('salsa')) return '🌶️';
+    return '🧂';
+  }
+  if (category === 'Leftovers') return '🍱';
+  if (category === 'Grains & Pantry') {
+    if (has('bread') || has('bun') || has('bagel')) return '🍞';
+    if (has('rice')) return '🍚';
+    if (has('pasta') || has('noodle')) return '🍝';
+    if (has('cereal')) return '🥣';
+    return '🥫';
+  }
+  if (category === 'Snacks') {
+    if (has('chip') || has('cracker')) return '🍪';
+    if (has('cookie')) return '🍪';
+    if (has('chocolate') || has('candy')) return '🍫';
+    return '🍿';
+  }
+  if (category === 'Frozen') return '🧊';
+  return '📦';
 }
 
 function normalizeBox(box) {
@@ -101,12 +220,12 @@ function specificityScore(name) {
 }
 
 function findMatchingKey(map, name) {
-  const target = normalizeName(name);
+  const target = canonicalizeName(name);
   if (map.has(target)) {
     return target;
   }
   for (const key of map.keys()) {
-    if (key.includes(target) || target.includes(key)) {
+    if (key.includes(target) || target.includes(key) || namesLookEquivalent(key, target)) {
       return key;
     }
   }
@@ -126,7 +245,7 @@ function normalizeResponse(payload) {
     .map((item) => ({
       name: String(item.name).trim(),
       category: normalizeCategory(item.category),
-      emoji: item.emoji || '📦',
+      emoji: pickEmoji(item.name, normalizeCategory(item.category)),
       quantity: item.quantity || 'Visible in frame',
       expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
       confidence: clampConfidence(item.confidence, 0.85),
@@ -135,7 +254,7 @@ function normalizeResponse(payload) {
     }))
     .filter((item) => item.confidence >= 0.72)
     .forEach((item) => {
-      const key = `${normalizeName(item.name)}|${item.category}`;
+      const key = `${canonicalizeName(item.name)}|${item.category}`;
       const prev = mergedItems.get(key);
       if (!prev || item.confidence > prev.confidence) {
         mergedItems.set(key, item);
@@ -146,14 +265,14 @@ function normalizeResponse(payload) {
     .filter((item) => item?.name)
     .map((item) => ({
       name: String(item.name).trim(),
-      emoji: item.emoji || '👀',
+      emoji: pickEmoji(item.name, 'Other'),
       reason: item.reason || 'Visible, but too unclear to confirm',
       confidence: clampConfidence(item.confidence, 0.4),
       frame_index: Number.isInteger(item.frame_index) ? Math.max(0, Math.min(5, item.frame_index)) : 0,
       box: normalizeBox(item.box),
     }))
     .forEach((item) => {
-      const key = normalizeName(item.name);
+      const key = canonicalizeName(item.name);
       const prev = mergedUncertain.get(key);
       if (!prev || item.confidence > prev.confidence) {
         mergedUncertain.set(key, item);
@@ -164,11 +283,11 @@ function normalizeResponse(payload) {
     .filter((item) => item?.name)
     .map((item) => ({
       name: String(item.name).trim(),
-      emoji: item.emoji || '🛒',
+      emoji: pickEmoji(item.name, 'Other'),
       reason: item.reason || 'Suggested from visible low stock',
     }))
     .forEach((item) => {
-      const key = normalizeName(item.name);
+      const key = canonicalizeName(item.name);
       if (!mergedShopping.has(key)) {
         mergedShopping.set(key, item);
       }
@@ -192,7 +311,7 @@ function normalizeReadPass(payload) {
     .map((item) => ({
       name: String(item.name).trim(),
       category: normalizeCategory(item.category),
-      emoji: item.emoji || '📦',
+      emoji: pickEmoji(item.name, normalizeCategory(item.category)),
       quantity: item.quantity || 'Visible in crop',
       expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
       confidence: clampConfidence(item.confidence, 0.72),
@@ -210,7 +329,7 @@ function mergeVisionPasses(primary, secondaryReads) {
     summary: primary.summary,
   };
   const itemMap = new Map();
-  merged.items.forEach((item) => itemMap.set(normalizeName(item.name), item));
+  merged.items.forEach((item) => itemMap.set(canonicalizeName(item.name), item));
 
   secondaryReads.forEach((read) => {
     const matchKey = findMatchingKey(itemMap, read.name);
@@ -218,7 +337,7 @@ function mergeVisionPasses(primary, secondaryReads) {
     if (existing) {
       if (specificityScore(read.name) > specificityScore(existing.name) && read.confidence >= existing.confidence - 0.03) {
         existing.name = read.name;
-        existing.emoji = read.emoji || existing.emoji;
+        existing.emoji = pickEmoji(read.name, read.category || existing.category);
         existing.category = read.category || existing.category;
       }
       if ((!existing.quantity || existing.quantity === 'Visible in frame') && read.quantity) {
@@ -228,10 +347,12 @@ function mergeVisionPasses(primary, secondaryReads) {
         existing.box = read.box;
       }
       existing.confidence = Math.max(existing.confidence, read.confidence);
+      existing.emoji = pickEmoji(existing.name, existing.category);
       return;
     }
+    read.emoji = pickEmoji(read.name, read.category);
     merged.items.push(read);
-    itemMap.set(normalizeName(read.name), read);
+    itemMap.set(canonicalizeName(read.name), read);
   });
 
   merged.uncertain_items = merged.uncertain_items.filter((item) => !findMatchingKey(itemMap, item.name));
