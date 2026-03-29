@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>FridgeAI</title>
+  <title>Freezy</title>
   <meta name="theme-color" content="#08080f">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,475 +12,130 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #08080f;
-      --surface: #0f0f1a;
-      --surface-2: #161624;
-      --surface-3: #1e1e2e;
-      --border: rgba(255,255,255,0.07);
-      --border-2: rgba(255,255,255,0.12);
-      --accent: #00e0a0;
-      --accent-dim: rgba(0,224,160,0.1);
-      --accent-glow: rgba(0,224,160,0.25);
-      --warn: #ffb347;
-      --danger: #ff5f5f;
-      --text: #ebebf5;
-      --text-2: #8888aa;
-      --text-3: #555570;
-      --mono: 'DM Mono', monospace;
-      --sans: 'Outfit', sans-serif;
-      --r: 14px;
-      --r-sm: 10px;
+      --bg:#08080f;--surface:#0f0f1a;--surface-2:#161624;--surface-3:#1e1e2e;
+      --border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.12);
+      --accent:#00e0a0;--accent-dim:rgba(0,224,160,0.1);--accent-glow:rgba(0,224,160,0.25);
+      --warn:#ffb347;--danger:#ff5f5f;--text:#ebebf5;--text-2:#8888aa;--text-3:#555570;
+      --mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;--r:14px;--r-sm:10px;
     }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      height: 100%; width: 100%;
-      overflow: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--sans);
-      -webkit-font-smoothing: antialiased;
-    }
-
-    /* Ambient glow */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background: radial-gradient(ellipse 80% 40% at 50% -10%, rgba(0,224,160,0.06) 0%, transparent 60%);
-      pointer-events: none; z-index: 0;
-    }
-
-    #app {
-      display: flex; flex-direction: column;
-      height: 100%; max-width: 430px;
-      margin: 0 auto; position: relative; z-index: 1;
-    }
-
-    /* ── Header ── */
-    header {
-      height: 60px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .logo {
-      font-family: var(--mono); font-size: 14px; font-weight: 500;
-      letter-spacing: 0.18em; text-transform: uppercase;
-    }
-    .logo-fridge { color: var(--accent); }
-    .logo-ai { color: var(--text-3); }
-
-    .header-right { display: flex; gap: 8px; align-items: center; }
-
-    .loc-pill {
-      font-family: var(--mono); font-size: 10px; font-weight: 500;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--accent); background: var(--accent-dim);
-      border: 1px solid rgba(0,224,160,0.2);
-      padding: 4px 10px; border-radius: 20px;
-    }
-
-    .icon-btn {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: var(--surface-2); border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-2);
-      transition: all 0.15s; flex-shrink: 0;
-    }
-    .icon-btn:active { transform: scale(0.9); color: var(--accent); }
-
-    /* ── Tab bar ── */
-    .tab-bar {
-      display: flex; padding: 10px 20px; gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .tab {
-      flex: 1; height: 38px; border-radius: 19px;
-      border: 1px solid var(--border); background: transparent;
-      color: var(--text-3); font-family: var(--sans);
-      font-size: 12px; font-weight: 500; cursor: pointer;
-      transition: all 0.2s; display: flex; align-items: center;
-      justify-content: center; gap: 5px;
-    }
-
-    .tab.active {
-      background: var(--accent-dim);
-      border-color: rgba(0,224,160,0.35);
-      color: var(--accent);
-    }
-
-    /* ── Content ── */
-    .content {
-      flex: 1; overflow-y: auto; padding: 4px 20px 140px;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .content::-webkit-scrollbar { display: none; }
-
-    /* ── Empty state ── */
-    .empty-state {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      height: 100%; gap: 14px; text-align: center;
-      padding: 40px 0;
-    }
-
-    .empty-icon {
-      width: 100px; height: 100px; border-radius: 28px;
-      background: var(--surface-2); border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 44px; margin-bottom: 4px;
-    }
-
-    .empty-state h2 { font-size: 18px; font-weight: 600; color: var(--text); }
-    .empty-state p { font-size: 13px; color: var(--text-2); max-width: 220px; line-height: 1.55; }
-
-    /* ── Scan preview ── */
-    .scan-preview-wrap { margin-top: 14px; }
-    .scan-preview {
-      width: 100%; border-radius: var(--r); overflow: hidden;
-      max-height: 150px; object-fit: cover;
-      border: 1px solid var(--border);
-    }
-    .scan-meta {
-      font-family: var(--mono); font-size: 9px; color: var(--text-3);
-      letter-spacing: 0.1em; padding: 5px 2px 10px;
-      text-transform: uppercase;
-    }
-
-    /* Rescan */
-    .rescan-btn {
-      width: 100%; height: 36px; border-radius: 18px;
-      background: var(--surface-2); border: 1px solid var(--border);
-      color: var(--text-2); font-family: var(--sans); font-size: 12px;
-      cursor: pointer; margin-bottom: 6px;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      transition: all 0.15s;
-    }
-    .rescan-btn:active { border-color: var(--accent); color: var(--accent); }
-
-    /* ── Category ── */
-    .category { margin-top: 18px; }
-
-    .cat-header {
-      font-family: var(--mono); font-size: 9px; font-weight: 500;
-      letter-spacing: 0.18em; text-transform: uppercase;
-      color: var(--text-3); padding: 6px 0 8px;
-      display: flex; align-items: center; gap: 7px;
-    }
-
-    .cat-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent); flex-shrink: 0;
-    }
-
-    /* ── Item card ── */
-    .item-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--r-sm); padding: 12px 14px;
-      display: flex; align-items: center; gap: 11px;
-      margin-bottom: 7px;
-      animation: slideIn 0.2s ease both;
-    }
-
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    .item-emoji { font-size: 20px; width: 32px; text-align: center; flex-shrink: 0; }
-
-    .item-info { flex: 1; min-width: 0; }
-    .item-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .item-qty  { font-size: 11px; color: var(--text-3); font-family: var(--mono); margin-top: 1px; }
-
-    .expiry-badge {
-      font-size: 9px; font-family: var(--mono);
-      padding: 2px 7px; border-radius: 20px;
-      font-weight: 500; flex-shrink: 0;
-      letter-spacing: 0.05em;
-    }
-    .ex-soon   { background: rgba(255,179,71,0.12); color: var(--warn);   border: 1px solid rgba(255,179,71,0.25); }
-    .ex-urgent { background: rgba(255,95,95,0.12);  color: var(--danger); border: 1px solid rgba(255,95,95,0.25); }
-
-    .del-btn {
-      width: 26px; height: 26px; border-radius: 50%;
-      background: transparent; border: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-3);
-      transition: all 0.15s; flex-shrink: 0;
-    }
-    .del-btn:active { background: rgba(255,95,95,0.15); color: var(--danger); border-color: rgba(255,95,95,0.4); }
-
-    /* ── Add item ── */
-    .add-row {
-      border: 1px dashed var(--border-2); border-radius: var(--r-sm);
-      padding: 10px 14px; display: flex; align-items: center; gap: 10px;
-      margin-bottom: 7px; cursor: pointer;
-      color: var(--text-3); font-size: 12px;
-      transition: all 0.15s;
-    }
-    .add-row:active { border-color: var(--accent); color: var(--accent); }
-
-    .add-input-row { display: flex; gap: 8px; margin-bottom: 7px; }
-    .add-input {
-      flex: 1; background: var(--surface); border: 1px solid var(--accent);
-      border-radius: var(--r-sm); padding: 10px 14px;
-      color: var(--text); font-family: var(--sans); font-size: 14px; outline: none;
-    }
-    .add-input::placeholder { color: var(--text-3); }
-    .add-ok {
-      width: 42px; flex-shrink: 0; background: var(--accent);
-      border: none; border-radius: var(--r-sm); cursor: pointer;
-      display: flex; align-items: center; justify-content: center; color: #08080f;
-    }
-
-    /* ── Shopping list ── */
-    .shop-section {
-      margin-top: 28px; padding-top: 22px;
-      border-top: 1px solid var(--border);
-    }
-
-    .section-label {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em;
-      text-transform: uppercase; color: var(--text-2); margin-bottom: 10px;
-    }
-
-    .shop-item {
-      display: flex; align-items: center; gap: 11px;
-      padding: 11px 14px; background: var(--surface);
-      border: 1px solid var(--border); border-radius: var(--r-sm);
-      margin-bottom: 7px; transition: opacity 0.2s;
-    }
-
-    .shop-check {
-      width: 19px; height: 19px; border-radius: 50%;
-      border: 1.5px solid var(--border-2); cursor: pointer;
-      transition: all 0.15s; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .shop-check.checked { background: var(--accent); border-color: var(--accent); }
-
-    .shop-name { font-size: 13px; color: var(--text); flex: 1; }
-    .shop-del {
-      background: none; border: none; color: var(--text-3);
-      cursor: pointer; font-size: 14px; padding: 2px;
-      transition: color 0.15s;
-    }
-    .shop-del:active { color: var(--danger); }
-
-    /* ── FAB ── */
-    .fab-wrap {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 12px 20px 36px;
-      background: linear-gradient(to top, var(--bg) 55%, transparent);
-      pointer-events: none;
-    }
-
-    .fab {
-      width: 100%; height: 54px; border-radius: 27px;
-      background: var(--accent); color: #08080f;
-      font-family: var(--sans); font-size: 15px; font-weight: 600;
-      border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      pointer-events: all;
-      transition: all 0.2s;
-      box-shadow: 0 0 32px var(--accent-glow);
-      letter-spacing: 0.02em;
-    }
-    .fab:active { transform: scale(0.97); box-shadow: 0 0 14px var(--accent-glow); }
-
-    /* ── Modals ── */
-    .overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(10px);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: flex-end;
-      z-index: 100; opacity: 0; pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    .overlay.open { opacity: 1; pointer-events: all; }
-
-    .sheet {
-      width: 100%; max-width: 430px;
-      background: var(--surface-2);
-      border-radius: 24px 24px 0 0;
-      padding: 20px 20px 44px;
-      transform: translateY(30px);
-      transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1);
-      border-top: 1px solid var(--border);
-    }
-    .overlay.open .sheet { transform: translateY(0); }
-
-    .handle {
-      width: 34px; height: 4px; border-radius: 2px;
-      background: var(--surface-3); margin: 0 auto 18px;
-    }
-
-    .sheet-title {
-      font-size: 16px; font-weight: 600;
-      text-align: center; margin-bottom: 20px; color: var(--text);
-    }
-
-    .capture-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .cap-opt {
-      background: var(--surface-3); border: 1px solid var(--border);
-      border-radius: var(--r); padding: 22px 16px; text-align: center;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .cap-opt:active { border-color: var(--accent); background: var(--accent-dim); }
-    .cap-opt-icon { font-size: 34px; margin-bottom: 6px; }
-    .cap-opt-label { font-size: 14px; font-weight: 500; color: var(--text); }
-    .cap-opt-sub { font-size: 11px; color: var(--text-3); margin-top: 3px; }
-
-    /* ── Camera modal ── */
-    .camera-modal {
-      position: fixed; inset: 0; background: #000; z-index: 200;
-      display: flex; flex-direction: column;
-      opacity: 0; pointer-events: none; transition: opacity 0.2s;
-    }
-    .camera-modal.open { opacity: 1; pointer-events: all; }
-
-    .cam-view { flex: 1; position: relative; overflow: hidden; }
-
-    #videoEl { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-    .cam-top {
-      position: absolute; top: 0; left: 0; right: 0;
-      padding: 16px 20px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-
-    .cam-close {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: white;
-    }
-
-    .rec-badge {
-      display: none; align-items: center; gap: 5px;
-      font-family: var(--mono); font-size: 11px; color: #fff;
-      background: rgba(255,95,95,0.8); padding: 4px 10px; border-radius: 20px;
-    }
-    .rec-badge.on { display: flex; }
-    .rec-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-
-    .cam-bottom {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 20px 24px 48px;
-    }
-
-    .cam-hint {
-      text-align: center; font-size: 12px;
-      color: rgba(255,255,255,0.55); font-family: var(--mono);
-      margin-bottom: 20px; letter-spacing: 0.05em;
-    }
-
-    .cam-controls {
-      display: flex; align-items: center;
-      justify-content: center; gap: 48px;
-    }
-
-    .cam-spacer { width: 40px; }
-
-    .shutter {
-      width: 68px; height: 68px; border-radius: 50%;
-      background: white; border: 4px solid rgba(255,255,255,0.35);
-      cursor: pointer; transition: all 0.12s; outline: none;
-    }
-    .shutter.rec { background: var(--danger); border-color: rgba(255,95,95,0.4); }
-    .shutter:active { transform: scale(0.9); }
-
-    /* ── Analyzing ── */
-    .analyzing {
-      position: fixed; inset: 0;
-      background: rgba(8,8,15,0.96);
-      z-index: 300; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 20px;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
-    }
-    .analyzing.open { opacity: 1; pointer-events: all; }
-
-    .spin-wrap {
-      width: 110px; height: 110px; position: relative;
-      display: flex; align-items: center; justify-content: center;
-    }
-
-    .spin-ring {
-      position: absolute; inset: 0; border-radius: 50%;
-      border: 2px solid var(--surface-3);
-    }
-    .spin-ring::after {
-      content: '';
-      position: absolute; inset: -2px; border-radius: 50%;
-      border: 2px solid transparent;
-      border-top-color: var(--accent);
-      animation: spin 0.9s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .spin-emoji { font-size: 44px; }
-
-    .analyzing-label {
-      font-family: var(--mono); font-size: 12px;
-      color: var(--text-2); letter-spacing: 0.12em;
-    }
-
-    .analyzing-sub {
-      font-size: 11px; color: var(--text-3); font-family: var(--mono);
-      letter-spacing: 0.08em;
-    }
-
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 110px; left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      background: var(--surface-2); border: 1px solid var(--border-2);
-      border-radius: 20px; padding: 9px 18px;
-      font-size: 13px; color: var(--text); z-index: 500;
-      opacity: 0; transition: all 0.25s;
-      white-space: nowrap; pointer-events: none;
-    }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    /* ── Canvas hidden ── */
-    #captureCanvas { display: none; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 40% at 50% -10%,rgba(0,224,160,0.06) 0%,transparent 60%);pointer-events:none;z-index:0}
+    #app{display:flex;flex-direction:column;height:100%;max-width:430px;margin:0 auto;position:relative;z-index:1}
+    header{height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border)}
+    .logo{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase}
+    .logo-fridge{color:var(--accent)}.logo-ai{color:var(--text-3)}
+    .header-right{display:flex;gap:8px;align-items:center}
+    .loc-pill{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,224,160,0.2);padding:4px 10px;border-radius:20px}
+    .icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);transition:all 0.15s;flex-shrink:0}
+    .icon-btn:active{transform:scale(0.9);color:var(--accent)}
+    .tab-bar{display:flex;padding:10px 20px;gap:8px;flex-shrink:0}
+    .tab{flex:1;height:38px;border-radius:19px;border:1px solid var(--border);background:transparent;color:var(--text-3);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px}
+    .tab.active{background:var(--accent-dim);border-color:rgba(0,224,160,0.35);color:var(--accent)}
+    .content{flex:1;overflow-y:auto;padding:4px 20px 140px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .content::-webkit-scrollbar{display:none}
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px;text-align:center;padding:40px 0}
+    .empty-icon{width:100px;height:100px;border-radius:28px;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:4px}
+    .empty-state h2{font-size:18px;font-weight:600;color:var(--text)}
+    .empty-state p{font-size:13px;color:var(--text-2);max-width:220px;line-height:1.55}
+    .scan-preview-wrap{margin-top:14px}
+    .scan-preview{width:100%;border-radius:var(--r);max-height:150px;object-fit:cover;border:1px solid var(--border);display:block}
+    .scan-meta{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:0.1em;padding:5px 2px 10px;text-transform:uppercase}
+    .rescan-btn{width:100%;height:36px;border-radius:18px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-family:var(--sans);font-size:12px;cursor:pointer;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s}
+    .rescan-btn:active{border-color:var(--accent);color:var(--accent)}
+    .category{margin-top:18px}
+    .cat-header{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);padding:6px 0 8px;display:flex;align-items:center;gap:7px}
+    .cat-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+    .item-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:7px;animation:slideIn 0.2s ease both}
+    @keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .item-emoji{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+    .item-info{flex:1;min-width:0}
+    .item-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .item-qty{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-top:1px}
+    .expiry-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:500;flex-shrink:0;letter-spacing:0.05em}
+    .ex-soon{background:rgba(255,179,71,0.12);color:var(--warn);border:1px solid rgba(255,179,71,0.25)}
+    .ex-urgent{background:rgba(255,95,95,0.12);color:var(--danger);border:1px solid rgba(255,95,95,0.25)}
+    .del-btn{width:26px;height:26px;border-radius:50%;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all 0.15s;flex-shrink:0}
+    .del-btn:active{background:rgba(255,95,95,0.15);color:var(--danger);border-color:rgba(255,95,95,0.4)}
+    .add-row{border:1px dashed var(--border-2);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer;color:var(--text-3);font-size:12px;transition:all 0.15s}
+    .add-row:active{border-color:var(--accent);color:var(--accent)}
+    .add-input-row{display:flex;gap:8px;margin-bottom:7px}
+    .add-input{flex:1;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none}
+    .add-input::placeholder{color:var(--text-3)}
+    .add-ok{width:42px;flex-shrink:0;background:var(--accent);border:none;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#08080f}
+    .shop-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--border)}
+    .section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-2);margin-bottom:10px}
+    .shop-item{display:flex;align-items:center;gap:11px;padding:11px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;transition:opacity 0.2s}
+    .shop-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--border-2);cursor:pointer;transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .shop-check.checked{background:var(--accent);border-color:var(--accent)}
+    .shop-name{font-size:13px;color:var(--text);flex:1}
+    .shop-del{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:2px;transition:color 0.15s}
+    .shop-del:active{color:var(--danger)}
+    .fab-wrap{position:absolute;bottom:0;left:0;right:0;padding:12px 20px 36px;background:linear-gradient(to top,var(--bg) 55%,transparent);pointer-events:none}
+    .fab{width:100%;height:54px;border-radius:27px;background:var(--accent);color:#08080f;font-family:var(--sans);font-size:15px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;pointer-events:all;transition:all 0.2s;box-shadow:0 0 32px var(--accent-glow);letter-spacing:0.02em}
+    .fab:active{transform:scale(0.97);box-shadow:0 0 14px var(--accent-glow)}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:100;opacity:0;pointer-events:none;transition:opacity 0.25s}
+    .overlay.open{opacity:1;pointer-events:all}
+    .sheet{width:100%;max-width:430px;background:var(--surface-2);border-radius:24px 24px 0 0;padding:20px 20px 44px;transform:translateY(30px);transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1);border-top:1px solid var(--border)}
+    .overlay.open .sheet{transform:translateY(0)}
+    .handle{width:34px;height:4px;border-radius:2px;background:var(--surface-3);margin:0 auto 18px}
+    .sheet-title{font-size:16px;font-weight:600;text-align:center;margin-bottom:20px;color:var(--text)}
+    .capture-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .cap-opt{background:var(--surface-3);border:1px solid var(--border);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s}
+    .cap-opt:active{border-color:var(--accent);background:var(--accent-dim)}
+    .cap-opt-icon{font-size:34px;margin-bottom:6px}
+    .cap-opt-label{font-size:14px;font-weight:500;color:var(--text)}
+    .cap-opt-sub{font-size:11px;color:var(--text-3);margin-top:3px}
+    .camera-modal{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity 0.2s}
+    .camera-modal.open{opacity:1;pointer-events:all}
+    .cam-view{flex:1;position:relative;overflow:hidden}
+    #videoEl{width:100%;height:100%;object-fit:cover;display:block}
+    .cam-top{position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+    .cam-close{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:white}
+    .rec-badge{display:none;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:#fff;background:rgba(255,95,95,0.8);padding:4px 10px;border-radius:20px}
+    .rec-badge.on{display:flex}
+    .rec-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+    @keyframes blink{50%{opacity:0}}
+    .cam-bottom{position:absolute;bottom:0;left:0;right:0;padding:20px 24px 48px}
+    .cam-hint{text-align:center;font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--mono);margin-bottom:20px;letter-spacing:0.05em}
+    .cam-controls{display:flex;align-items:center;justify-content:center;gap:48px}
+    .shutter{width:68px;height:68px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,0.35);cursor:pointer;transition:all 0.12s;outline:none}
+    .shutter.rec{background:var(--danger);border-color:rgba(255,95,95,0.4)}
+    .shutter:active{transform:scale(0.9)}
+    .analyzing{position:fixed;inset:0;background:rgba(8,8,15,0.96);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;pointer-events:none;transition:opacity 0.3s}
+    .analyzing.open{opacity:1;pointer-events:all}
+    .spin-wrap{width:110px;height:110px;position:relative;display:flex;align-items:center;justify-content:center}
+    .spin-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--surface-3)}
+    .spin-ring::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;border-top-color:var(--accent);animation:spin 0.9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spin-emoji{font-size:44px}
+    .analyzing-label{font-family:var(--mono);font-size:12px;color:var(--text-2);letter-spacing:0.12em}
+    .analyzing-sub{font-size:11px;color:var(--text-3);font-family:var(--mono);letter-spacing:0.08em}
+    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface-2);border:1px solid var(--border-2);border-radius:20px;padding:9px 18px;font-size:13px;color:var(--text);z-index:500;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    #captureCanvas{display:none}
   </style>
 </head>
 <body>
 <div id="app">
-
   <header>
-    <div class="logo">
-      <span class="logo-fridge">fridge</span><span class="logo-ai">.ai</span>
-    </div>
+    <div class="logo"><span class="logo-fridge">freezy</span><span class="logo-ai">.ai</span></div>
     <div class="header-right">
       <div class="loc-pill" id="locPill">Fridge</div>
       <button class="icon-btn" id="shareBtn" title="Share list">
         <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
         </svg>
       </button>
     </div>
   </header>
-
   <div class="tab-bar">
     <button class="tab active" data-loc="fridge">🧊 Fridge</button>
     <button class="tab" data-loc="freezer">❄️ Freezer</button>
     <button class="tab" data-loc="pantry">🥫 Pantry</button>
   </div>
-
   <div class="content" id="content"></div>
-
   <div class="fab-wrap">
     <button class="fab" id="scanBtn">
       <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -492,7 +147,6 @@
   </div>
 </div>
 
-<!-- Capture mode picker -->
 <div class="overlay" id="captureOverlay">
   <div class="sheet">
     <div class="handle"></div>
@@ -512,36 +166,30 @@
   </div>
 </div>
 
-<!-- Camera -->
 <div class="camera-modal" id="cameraModal">
   <div class="cam-view">
     <video id="videoEl" autoplay playsinline muted></video>
     <canvas id="captureCanvas"></canvas>
-
     <div class="cam-top">
       <button class="cam-close" id="camClose">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
-      <div class="rec-badge" id="recBadge">
-        <div class="rec-dot"></div> REC
-      </div>
+      <div class="rec-badge" id="recBadge"><div class="rec-dot"></div> REC</div>
       <div style="width:40px"></div>
     </div>
-
     <div class="cam-bottom">
       <div class="cam-hint" id="camHint"></div>
       <div class="cam-controls">
-        <div class="cam-spacer"></div>
+        <div style="width:40px"></div>
         <button class="shutter" id="shutterBtn"></button>
-        <div class="cam-spacer"></div>
+        <div style="width:40px"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Analyzing -->
 <div class="analyzing" id="analyzingOverlay">
   <div class="spin-wrap">
     <div class="spin-ring"></div>
@@ -551,450 +199,166 @@
   <div class="analyzing-sub">Powered by Claude Vision</div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ─────────────── State ───────────────
-const state = {
-  loc: 'fridge',
-  data: {
-    fridge:  { cats: {}, shopping: [], preview: null },
-    freezer: { cats: {}, shopping: [], preview: null },
-    pantry:  { cats: {}, shopping: [], preview: null }
-  },
-  captureMode: 'photo',
-  stream: null,
-  isRecording: false
-};
-
-// ─────────────── DOM ───────────────
-const $  = id => document.getElementById(id);
-const content         = $('content');
-const captureOverlay  = $('captureOverlay');
-const cameraModal     = $('cameraModal');
-const analyzingOverlay= $('analyzingOverlay');
-const videoEl         = $('videoEl');
-const canvas          = $('captureCanvas');
-const toast           = $('toast');
-const recBadge        = $('recBadge');
-const shutterBtn      = $('shutterBtn');
-const camHint         = $('camHint');
-const locPill         = $('locPill');
-const spinEmoji       = $('spinEmoji');
-
-function curData() { return state.data[state.loc]; }
-
-const LOC_META = {
-  fridge:  { label: 'Fridge',  emoji: '🧊' },
-  freezer: { label: 'Freezer', emoji: '❄️' },
-  pantry:  { label: 'Pantry',  emoji: '🥫' }
-};
-
-// ─────────────── Tabs ───────────────
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+const state={loc:'fridge',data:{fridge:{cats:{},shopping:[],preview:null},freezer:{cats:{},shopping:[],preview:null},pantry:{cats:{},shopping:[],preview:null}},captureMode:'photo',stream:null,isRecording:false};
+const $=id=>document.getElementById(id);
+const content=$('content'),captureOverlay=$('captureOverlay'),cameraModal=$('cameraModal'),analyzingOverlay=$('analyzingOverlay'),videoEl=$('videoEl'),canvas=$('captureCanvas'),toast=$('toast'),recBadge=$('recBadge'),shutterBtn=$('shutterBtn'),camHint=$('camHint'),locPill=$('locPill'),spinEmoji=$('spinEmoji');
+const LOC_META={fridge:{label:'Fridge',emoji:'🧊'},freezer:{label:'Freezer',emoji:'❄️'},pantry:{label:'Pantry',emoji:'🥫'}};
+function curData(){return state.data[state.loc]}
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    state.loc = tab.dataset.loc;
-    locPill.textContent = LOC_META[state.loc].label;
-    spinEmoji.textContent = LOC_META[state.loc].emoji;
+    state.loc=tab.dataset.loc;
+    locPill.textContent=LOC_META[state.loc].label;
+    spinEmoji.textContent=LOC_META[state.loc].emoji;
     render();
   });
 });
-
-// ─────────────── Scan button ───────────────
-$('scanBtn').addEventListener('click', openCaptureModal);
-$('shareBtn').addEventListener('click', shareList);
-
-// ─────────────── Capture modal ───────────────
-function openCaptureModal() {
-  captureOverlay.classList.add('open');
-}
-
-function closeCaptureModal() {
-  captureOverlay.classList.remove('open');
-}
-
-captureOverlay.addEventListener('click', e => {
-  if (e.target === captureOverlay) closeCaptureModal();
-});
-
-$('photoOpt').addEventListener('click', () => {
-  closeCaptureModal();
-  state.captureMode = 'photo';
-  startCamera();
-});
-
-$('videoOpt').addEventListener('click', () => {
-  closeCaptureModal();
-  state.captureMode = 'video';
-  startCamera();
-});
-
-// ─────────────── Camera ───────────────
-async function startCamera() {
-  try {
-    state.stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false
-    });
-    videoEl.srcObject = state.stream;
-
-    if (state.captureMode === 'photo') {
-      camHint.textContent = `Point at your ${state.loc} and tap`;
-      shutterBtn.classList.remove('rec');
-    } else {
-      camHint.textContent = `Tap to start recording`;
-      shutterBtn.classList.remove('rec');
-    }
-
-    state.isRecording = false;
+$('scanBtn').addEventListener('click',openCaptureModal);
+$('shareBtn').addEventListener('click',shareList);
+function openCaptureModal(){captureOverlay.classList.add('open')}
+function closeCaptureModal(){captureOverlay.classList.remove('open')}
+captureOverlay.addEventListener('click',e=>{if(e.target===captureOverlay)closeCaptureModal()});
+$('photoOpt').addEventListener('click',()=>{closeCaptureModal();state.captureMode='photo';startCamera()});
+$('videoOpt').addEventListener('click',()=>{closeCaptureModal();state.captureMode='video';startCamera()});
+async function startCamera(){
+  try{
+    state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    videoEl.srcObject=state.stream;
+    camHint.textContent=state.captureMode==='photo'?`Point at your ${state.loc} and tap`:`Tap to start recording`;
+    shutterBtn.classList.remove('rec');
+    state.isRecording=false;
     recBadge.classList.remove('on');
     cameraModal.classList.add('open');
-  } catch (err) {
-    showToast('⚠️ Camera access denied');
-    console.error(err);
-  }
+  }catch(err){showToast('⚠️ Camera access denied');console.error(err)}
 }
-
-function stopCamera() {
-  if (state.stream) {
-    state.stream.getTracks().forEach(t => t.stop());
-    state.stream = null;
-  }
-  videoEl.srcObject = null;
+function stopCamera(){
+  if(state.stream){state.stream.getTracks().forEach(t=>t.stop());state.stream=null}
+  videoEl.srcObject=null;
   cameraModal.classList.remove('open');
   recBadge.classList.remove('on');
   shutterBtn.classList.remove('rec');
-  state.isRecording = false;
+  state.isRecording=false;
 }
-
-$('camClose').addEventListener('click', stopCamera);
-
-shutterBtn.addEventListener('click', () => {
-  if (state.captureMode === 'photo') {
-    captureFrame();
-  } else {
-    if (!state.isRecording) {
-      state.isRecording = true;
-      shutterBtn.classList.add('rec');
-      recBadge.classList.add('on');
-      camHint.textContent = `Slowly pan across your ${state.loc}... tap to finish`;
-    } else {
-      captureFrame();
-    }
+$('camClose').addEventListener('click',stopCamera);
+shutterBtn.addEventListener('click',()=>{
+  if(state.captureMode==='photo'){captureFrame()}
+  else{
+    if(!state.isRecording){state.isRecording=true;shutterBtn.classList.add('rec');recBadge.classList.add('on');camHint.textContent=`Slowly pan across your ${state.loc}... tap to finish`}
+    else{captureFrame()}
   }
 });
-
-function captureFrame() {
-  const w = videoEl.videoWidth  || 1280;
-  const h = videoEl.videoHeight || 720;
-  canvas.width = w; canvas.height = h;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(videoEl, 0, 0);
-
-  const fullBase64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
-  const preview    = canvas.toDataURL('image/jpeg', 0.4);
-
+function captureFrame(){
+  const w=videoEl.videoWidth||1280,h=videoEl.videoHeight||720;
+  canvas.width=w;canvas.height=h;
+  canvas.getContext('2d').drawImage(videoEl,0,0);
+  const fullBase64=canvas.toDataURL('image/jpeg',0.7).split(',')[1];
+  const preview=canvas.toDataURL('image/jpeg',0.35);
   stopCamera();
-  analyzeImage(fullBase64, preview);
+  analyzeImage(fullBase64,preview);
 }
-
-// ─────────────── AI Analysis ───────────────
-async function analyzeImage(base64, preview) {
+async function analyzeImage(base64,preview){
   analyzingOverlay.classList.add('open');
-
-  const loc = state.loc;
-  const prompt = `You are analyzing a photo of a ${loc}.
-
-Identify ALL visible food and drink items. Return ONLY a valid JSON object — no markdown, no explanation — with exactly this structure:
-
-{
-  "items": [
-    {
-      "name": "item name",
-      "category": "Dairy|Produce|Meat & Seafood|Beverages|Condiments & Sauces|Leftovers|Grains & Pantry|Snacks|Other",
-      "emoji": "single emoji",
-      "quantity": "e.g. '2 bottles', 'half-full carton', '1 bunch'",
-      "expiry_concern": "none|soon|urgent"
-    }
-  ],
-  "shopping": [
-    { "name": "item", "emoji": "emoji" }
-  ]
-}
-
-expiry_concern rules:
-- "none" = looks fresh / long shelf life
-- "soon" = might expire within a few days
-- "urgent" = should be used today / tomorrow
-
-shopping: suggest 4-6 common items that appear to be missing or running low based on what you see.
-
-Return ONLY valid JSON.`;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
-      })
+  const loc=state.loc;
+  try{
+    const res=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({base64,location:loc})
     });
-
-    const apiData = await res.json();
-    let raw = apiData.content?.[0]?.text || '{}';
-    raw = raw.replace(/```json|```/g, '').trim();
-
-    let parsed;
-    try { parsed = JSON.parse(raw); }
-    catch { parsed = { items: [], shopping: [] }; showToast('Could not parse results — try again'); }
-
-    const d = state.data[loc];
-    d.preview = preview;
-    d.cats = {};
-    d.shopping = parsed.shopping || [];
-
-    (parsed.items || []).forEach(item => {
-      const cat = item.category || 'Other';
-      if (!d.cats[cat]) d.cats[cat] = [];
-      d.cats[cat].push({ ...item });
-    });
-
-    if (!Object.keys(d.cats).length) {
-      showToast("Couldn't find items — try better lighting");
+    if(!res.ok){
+      const errText=await res.text();
+      console.error('API error:',res.status,errText);
+      showToast('⚠️ Error '+res.status+' — try again');
+      analyzingOverlay.classList.remove('open');
+      return;
     }
-
-  } catch (err) {
-    showToast('⚠️ Analysis failed — check connection');
-    console.error(err);
-  }
-
+    const parsed=await res.json();
+    const d=state.data[loc];
+    d.preview=preview;d.cats={};d.shopping=parsed.shopping||[];
+    (parsed.items||[]).forEach(item=>{
+      const cat=item.category||'Other';
+      if(!d.cats[cat])d.cats[cat]=[];
+      d.cats[cat].push({...item});
+    });
+    if(!Object.keys(d.cats).length)showToast("Couldn't find items — try better lighting");
+  }catch(err){console.error('Fetch error:',err);showToast('⚠️ Network error — check connection')}
   analyzingOverlay.classList.remove('open');
   render();
 }
-
-// ─────────────── Render ───────────────
-function render() {
-  const d = curData();
-  const cats = Object.keys(d.cats);
-
-  if (!cats.length) {
-    content.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">${LOC_META[state.loc].emoji}</div>
-        <h2>Nothing scanned yet</h2>
-        <p>Tap Scan Now to photograph your ${state.loc} and get an instant inventory</p>
-      </div>`;
+function render(){
+  const d=curData();
+  const cats=Object.keys(d.cats);
+  if(!cats.length){
+    content.innerHTML=`<div class="empty-state"><div class="empty-icon">${LOC_META[state.loc].emoji}</div><h2>Nothing scanned yet</h2><p>Tap Scan Now to photograph your ${state.loc} and get an instant inventory</p></div>`;
     return;
   }
-
-  let html = '';
-
-  // Preview
-  if (d.preview) {
-    html += `<div class="scan-preview-wrap">
-      <img src="${d.preview}" class="scan-preview" alt="Scan">
-      <div class="scan-meta">⟳ Last scan · ${LOC_META[state.loc].label}</div>
-    </div>`;
-  }
-
-  html += `<button class="rescan-btn" onclick="openCaptureModal()">📷 Scan again</button>`;
-
-  // Categories
-  cats.forEach(cat => {
-    const catKey = cat.replace(/[^a-z0-9]/gi,'_');
-    html += `<div class="category">
-      <div class="cat-header"><div class="cat-dot"></div>${cat}</div>`;
-
-    d.cats[cat].forEach((item, idx) => {
-      let badge = '';
-      if (item.expiry_concern === 'soon')   badge = `<span class="expiry-badge ex-soon">USE SOON</span>`;
-      if (item.expiry_concern === 'urgent') badge = `<span class="expiry-badge ex-urgent">USE NOW</span>`;
-
-      html += `<div class="item-card">
-        <span class="item-emoji">${item.emoji || '🍽️'}</span>
-        <div class="item-info">
-          <div class="item-name">${escHtml(item.name)}</div>
-          ${item.quantity ? `<div class="item-qty">${escHtml(item.quantity)}</div>` : ''}
-        </div>
-        ${badge}
-        <button class="del-btn" onclick="deleteItem('${escHtml(cat)}',${idx})">
-          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>`;
+  let html='';
+  if(d.preview)html+=`<div class="scan-preview-wrap"><img src="${d.preview}" class="scan-preview" alt="Scan"><div class="scan-meta">⟳ Last scan · ${LOC_META[state.loc].label}</div></div>`;
+  html+=`<button class="rescan-btn" onclick="openCaptureModal()">📷 Scan again</button>`;
+  cats.forEach(cat=>{
+    const catKey=cat.replace(/[^a-z0-9]/gi,'_');
+    html+=`<div class="category"><div class="cat-header"><div class="cat-dot"></div>${escHtml(cat)}</div>`;
+    d.cats[cat].forEach((item,idx)=>{
+      let badge='';
+      if(item.expiry_concern==='soon')badge=`<span class="expiry-badge ex-soon">USE SOON</span>`;
+      if(item.expiry_concern==='urgent')badge=`<span class="expiry-badge ex-urgent">USE NOW</span>`;
+      html+=`<div class="item-card"><span class="item-emoji">${item.emoji||'🍽️'}</span><div class="item-info"><div class="item-name">${escHtml(item.name)}</div>${item.quantity?`<div class="item-qty">${escHtml(item.quantity)}</div>`:''}</div>${badge}<button class="del-btn" onclick="deleteItem('${escHtml(cat)}',${idx})"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
     });
-
-    // Add row
-    html += `<div class="add-row" id="addrow_${catKey}" onclick="showAddInput('${escHtml(cat)}','${catKey}')">
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-      </svg>
-      Add to ${cat}
-    </div>`;
-
-    html += `</div>`;
+    html+=`<div class="add-row" id="addrow_${catKey}" onclick="showAddInput('${escHtml(cat)}','${catKey}')"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add to ${escHtml(cat)}</div></div>`;
   });
-
-  // Shopping list
-  if (d.shopping.length) {
-    html += `<div class="shop-section">
-      <div class="section-label">🛒 Shopping List</div>`;
-
-    d.shopping.forEach((item, i) => {
-      html += `<div class="shop-item" id="shoprow_${i}">
-        <div class="shop-check" id="shopchk_${i}" onclick="toggleShop(${i})"></div>
-        <span style="font-size:18px">${item.emoji||'🛒'}</span>
-        <span class="shop-name">${escHtml(item.name)}</span>
-        <button class="shop-del" onclick="deleteShop(${i})">×</button>
-      </div>`;
+  if(d.shopping.length){
+    html+=`<div class="shop-section"><div class="section-label">🛒 Shopping List</div>`;
+    d.shopping.forEach((item,i)=>{
+      html+=`<div class="shop-item" id="shoprow_${i}"><div class="shop-check" id="shopchk_${i}" onclick="toggleShop(${i})"></div><span style="font-size:18px">${item.emoji||'🛒'}</span><span class="shop-name">${escHtml(item.name)}</span><button class="shop-del" onclick="deleteShop(${i})">×</button></div>`;
     });
-
-    html += `</div>`;
+    html+=`</div>`;
   }
-
-  content.innerHTML = html;
+  content.innerHTML=html;
 }
-
-// ─────────────── Item actions ───────────────
-function deleteItem(cat, idx) {
-  const d = curData();
-  if (!d.cats[cat]) return;
-  d.cats[cat].splice(idx, 1);
-  if (!d.cats[cat].length) delete d.cats[cat];
+function deleteItem(cat,idx){const d=curData();if(!d.cats[cat])return;d.cats[cat].splice(idx,1);if(!d.cats[cat].length)delete d.cats[cat];render()}
+function showAddInput(cat,catKey){
+  const row=document.getElementById('addrow_'+catKey);if(!row)return;
+  const inputId='addinp_'+catKey;
+  row.outerHTML=`<div class="add-input-row"><input class="add-input" id="${inputId}" placeholder="Item name..." autocomplete="off"><button class="add-ok" onclick="confirmAdd('${escHtml(cat)}','${catKey}')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></div>`;
+  const inp=document.getElementById(inputId);
+  if(inp){inp.focus();inp.addEventListener('keydown',e=>{if(e.key==='Enter')confirmAdd(cat,catKey)})}
+}
+function confirmAdd(cat,catKey){
+  const inp=document.getElementById('addinp_'+catKey);
+  const val=inp?inp.value.trim():'';
+  if(val){const d=curData();if(!d.cats[cat])d.cats[cat]=[];d.cats[cat].push({name:val,category:cat,emoji:'🍽️',quantity:'',expiry_concern:'none'})}
   render();
 }
-
-function showAddInput(cat, catKey) {
-  const row = document.getElementById('addrow_' + catKey);
-  if (!row) return;
-  const inputId = 'addinp_' + catKey;
-  row.outerHTML = `<div class="add-input-row">
-    <input class="add-input" id="${inputId}" placeholder="Item name..." autocomplete="off">
-    <button class="add-ok" onclick="confirmAdd('${escHtml(cat)}','${catKey}')">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
-        <polyline points="20 6 9 17 4 12"/>
-      </svg>
-    </button>
-  </div>`;
-  const inp = document.getElementById(inputId);
-  if (inp) {
-    inp.focus();
-    inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') confirmAdd(cat, catKey);
-    });
-  }
+function toggleShop(i){
+  const chk=document.getElementById('shopchk_'+i),row=document.getElementById('shoprow_'+i);if(!chk)return;
+  const on=chk.classList.toggle('checked');
+  chk.innerHTML=on?`<svg width="9" height="9" fill="none" stroke="#08080f" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`:'';
+  if(row)row.style.opacity=on?'0.35':'1';
 }
-
-function confirmAdd(cat, catKey) {
-  const inp = document.getElementById('addinp_' + catKey);
-  const val = inp ? inp.value.trim() : '';
-  if (val) {
-    const d = curData();
-    if (!d.cats[cat]) d.cats[cat] = [];
-    d.cats[cat].push({ name: val, category: cat, emoji: '🍽️', quantity: '', expiry_concern: 'none' });
-  }
-  render();
-}
-
-function toggleShop(i) {
-  const chk = document.getElementById('shopchk_' + i);
-  const row = document.getElementById('shoprow_' + i);
-  if (!chk) return;
-  const on = chk.classList.toggle('checked');
-  chk.innerHTML = on
-    ? `<svg width="9" height="9" fill="none" stroke="#08080f" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`
-    : '';
-  if (row) row.style.opacity = on ? '0.35' : '1';
-}
-
-function deleteShop(i) {
-  curData().shopping.splice(i, 1);
-  render();
-}
-
-// ─────────────── Share ───────────────
-function shareList() {
-  const d = curData();
-  const cats = Object.keys(d.cats);
-  if (!cats.length) { showToast('Nothing to share yet'); return; }
-
-  const label = LOC_META[state.loc].label;
-  let text = `${LOC_META[state.loc].emoji} ${label} Contents\n${'─'.repeat(24)}\n\n`;
-
-  cats.forEach(cat => {
-    text += `${cat}\n`;
-    d.cats[cat].forEach(item => {
-      const qty = item.quantity ? ` · ${item.quantity}` : '';
-      const flag = item.expiry_concern === 'urgent' ? ' ⚠️' : item.expiry_concern === 'soon' ? ' 🕐' : '';
-      text += `  ${item.emoji} ${item.name}${qty}${flag}\n`;
-    });
-    text += '\n';
+function deleteShop(i){curData().shopping.splice(i,1);render()}
+function shareList(){
+  const d=curData();const cats=Object.keys(d.cats);
+  if(!cats.length){showToast('Nothing to share yet');return}
+  const label=LOC_META[state.loc].label;
+  let text=`${LOC_META[state.loc].emoji} ${label} Contents\n${'─'.repeat(24)}\n\n`;
+  cats.forEach(cat=>{
+    text+=`${cat}\n`;
+    d.cats[cat].forEach(item=>{const qty=item.quantity?` · ${item.quantity}`:'';const flag=item.expiry_concern==='urgent'?' ⚠️':item.expiry_concern==='soon'?' 🕐':'';text+=`  ${item.emoji} ${item.name}${qty}${flag}\n`});
+    text+='\n';
   });
-
-  if (d.shopping.length) {
-    text += `🛒 Shopping List\n`;
-    d.shopping.forEach(item => text += `  ${item.emoji} ${item.name}\n`);
-  }
-
-  if (navigator.share) {
-    navigator.share({ title: 'FridgeAI', text });
-  } else {
-    navigator.clipboard.writeText(text)
-      .then(() => showToast('📋 List copied to clipboard!'))
-      .catch(() => showToast('⚠️ Could not copy'));
-  }
+  if(d.shopping.length){text+=`🛒 Shopping List\n`;d.shopping.forEach(item=>text+=`  ${item.emoji} ${item.name}\n`)}
+  if(navigator.share)navigator.share({title:'Freezy',text});
+  else navigator.clipboard.writeText(text).then(()=>showToast('📋 Copied!')).catch(()=>showToast('⚠️ Could not copy'));
 }
-
-// ─────────────── Toast ───────────────
 let toastTimer;
-function showToast(msg, ms = 2800) {
-  clearTimeout(toastTimer);
-  toast.textContent = msg;
-  toast.classList.add('show');
-  toastTimer = setTimeout(() => toast.classList.remove('show'), ms);
-}
-
-// ─────────────── Utils ───────────────
-function escHtml(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// Expose for inline onclick
-Object.assign(window, {
-  openCaptureModal,
-  deleteItem,
-  showAddInput,
-  confirmAdd,
-  toggleShop,
-  deleteShop
-});
-
-// ─────────────── Init ───────────────
+function showToast(msg,ms=2800){clearTimeout(toastTimer);toast.textContent=msg;toast.classList.add('show');toastTimer=setTimeout(()=>toast.classList.remove('show'),ms)}
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+Object.assign(window,{openCaptureModal,deleteItem,showAddInput,confirmAdd,toggleShop,deleteShop});
 render();
-
-// Register minimal service worker for PWA
-if ('serviceWorker' in navigator) {
-  const sw = `
-    self.addEventListener('install', () => self.skipWaiting());
-    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => new Response('Offline'))));
-  `;
-  const blob = new Blob([sw], { type: 'application/javascript' });
-  navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-}
 </script>
 </body>
 </html>
