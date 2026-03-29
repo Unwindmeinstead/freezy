@@ -1,0 +1,24 @@
+{
+  "name": "Freezy",
+  "short_name": "Freezy",
+  "description": "Scan your fridge, freezer, and pantry into a trustworthy inventory.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09131d",
+  "theme_color": "#09131d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

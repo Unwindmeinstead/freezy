@@ -1,5 +1,9 @@
 {
   "rewrites": [
+    { "source": "/manifest.webmanifest", "destination": "/manifest.webmanifest" },
+    { "source": "/sw.js", "destination": "/sw.js" },
+    { "source": "/icon.svg", "destination": "/icon.svg" },
+    { "source": "/apple-touch-icon.svg", "destination": "/apple-touch-icon.svg" },
     { "source": "/api/:path*", "destination": "/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
