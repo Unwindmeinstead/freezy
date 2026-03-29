@@ -43,6 +43,13 @@ function clampConfidence(value, fallback = 0) {
   return Math.max(0, Math.min(1, num));
 }
 
+function normalizeName(value) {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
 function normalizeCategory(category) {
   const allowed = new Set([
     'Dairy',
@@ -63,35 +70,63 @@ function normalizeResponse(payload) {
   const items = Array.isArray(payload?.items) ? payload.items : [];
   const uncertainItems = Array.isArray(payload?.uncertain_items) ? payload.uncertain_items : [];
   const shopping = Array.isArray(payload?.shopping) ? payload.shopping : [];
+  const mergedItems = new Map();
+  const mergedUncertain = new Map();
+  const mergedShopping = new Map();
+
+  items
+    .filter((item) => item?.name)
+    .map((item) => ({
+      name: String(item.name).trim(),
+      category: normalizeCategory(item.category),
+      emoji: item.emoji || '📦',
+      quantity: item.quantity || 'Visible in frame',
+      expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
+      confidence: clampConfidence(item.confidence, 0.85),
+    }))
+    .filter((item) => item.confidence >= 0.72)
+    .forEach((item) => {
+      const key = `${normalizeName(item.name)}|${item.category}`;
+      const prev = mergedItems.get(key);
+      if (!prev || item.confidence > prev.confidence) {
+        mergedItems.set(key, item);
+      }
+    });
+
+  uncertainItems
+    .filter((item) => item?.name)
+    .map((item) => ({
+      name: String(item.name).trim(),
+      emoji: item.emoji || '👀',
+      reason: item.reason || 'Visible, but too unclear to confirm',
+      confidence: clampConfidence(item.confidence, 0.4),
+    }))
+    .forEach((item) => {
+      const key = normalizeName(item.name);
+      const prev = mergedUncertain.get(key);
+      if (!prev || item.confidence > prev.confidence) {
+        mergedUncertain.set(key, item);
+      }
+    });
+
+  shopping
+    .filter((item) => item?.name)
+    .map((item) => ({
+      name: String(item.name).trim(),
+      emoji: item.emoji || '🛒',
+      reason: item.reason || 'Suggested from visible low stock',
+    }))
+    .forEach((item) => {
+      const key = normalizeName(item.name);
+      if (!mergedShopping.has(key)) {
+        mergedShopping.set(key, item);
+      }
+    });
 
   return {
-    items: items
-      .filter((item) => item?.name)
-      .map((item) => ({
-        name: String(item.name).trim(),
-        category: normalizeCategory(item.category),
-        emoji: item.emoji || '📦',
-        quantity: item.quantity || 'Visible in frame',
-        expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
-        confidence: clampConfidence(item.confidence, 0.85),
-      }))
-      .filter((item) => item.confidence >= 0.72),
-    uncertain_items: uncertainItems
-      .filter((item) => item?.name)
-      .map((item) => ({
-        name: String(item.name).trim(),
-        emoji: item.emoji || '👀',
-        reason: item.reason || 'Visible, but too unclear to confirm',
-        confidence: clampConfidence(item.confidence, 0.4),
-      })),
-    shopping: shopping
-      .filter((item) => item?.name)
-      .map((item) => ({
-        name: String(item.name).trim(),
-        emoji: item.emoji || '🛒',
-        reason: item.reason || 'Suggested from visible low stock',
-      }))
-      .slice(0, 6),
+    items: Array.from(mergedItems.values()),
+    uncertain_items: Array.from(mergedUncertain.values()).slice(0, 8),
+    shopping: Array.from(mergedShopping.values()).slice(0, 6),
     summary: {
       overview: payload?.summary?.overview || payload?.summary || '',
       confidence_note: payload?.summary?.confidence_note || '',
@@ -116,18 +151,25 @@ export default async function handler(req) {
 
   try {
     const body = await req.json();
-    const { base64, location } = body;
-
-    if (!base64 || !location) {
-      return jsonResponse({ error: 'Missing base64 or location' }, 400);
+    const { base64, frames, location } = body;
+    const normalizedFrames = Array.isArray(frames)
+      ? frames.filter((frame) => typeof frame === 'string' && frame.length > 100).slice(0, 4)
+      : [];
+    if (!normalizedFrames.length && typeof base64 === 'string' && base64.length > 100) {
+      normalizedFrames.push(base64);
     }
 
-    const prompt = `You are analyzing a photo of a ${location} for a premium kitchen inventory app.
+    if (!normalizedFrames.length || !location) {
+      return jsonResponse({ error: 'Missing frames or location' }, 400);
+    }
+
+    const prompt = `You are analyzing ${normalizedFrames.length > 1 ? 'multiple frames from a sweep of' : 'a photo of'} a ${location} for a premium kitchen inventory app.
 
 Your first job is TRUST, not completeness.
 
 Rules:
-- Only include items that are clearly and directly visible in the image.
+- The input may contain 1 to 4 images from the same ${location}. Use all frames together, but deduplicate the final result.
+- Only include items that are clearly and directly visible in at least one frame.
 - Do NOT infer hidden items, likely groceries, or common household staples.
 - Do NOT guess based on context, shelf type, packaging color, or what "should" be in a ${location}.
 - If a container is too blurry, occluded, too far away, or partially visible, do not promote it to confirmed inventory.
@@ -195,10 +237,10 @@ Return strict JSON only.`;
             role: 'user',
             content: [
               { type: 'text', text: prompt },
-              {
+              ...normalizedFrames.map((frame) => ({
                 type: 'image_url',
-                image_url: { url: `data:image/jpeg;base64,${base64}` }
-              }
+                image_url: { url: `data:image/jpeg;base64,${frame}` }
+              }))
             ]
           }]
         })
@@ -231,8 +273,12 @@ Return strict JSON only.`;
             content: [
               {
                 type: 'image',
-                source: { type: 'base64', media_type: 'image/jpeg', data: base64 }
+                source: { type: 'base64', media_type: 'image/jpeg', data: normalizedFrames[0] }
               },
+              ...normalizedFrames.slice(1).map((frame) => ({
+                type: 'image',
+                source: { type: 'base64', media_type: 'image/jpeg', data: frame }
+              })),
               { type: 'text', text: prompt }
             ]
           }]
