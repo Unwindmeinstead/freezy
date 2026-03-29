@@ -359,6 +359,74 @@ function mergeVisionPasses(primary, secondaryReads) {
   return merged;
 }
 
+function normalizeVerificationPass(payload) {
+  const verified = Array.isArray(payload?.verified_items) ? payload.verified_items : [];
+  const rejected = Array.isArray(payload?.rejected_items) ? payload.rejected_items : [];
+  return {
+    verified_items: verified
+      .filter((item) => item?.name)
+      .map((item) => ({
+        name: String(item.name).trim(),
+        canonical_name: String(item.canonical_name || item.name).trim(),
+        category: normalizeCategory(item.category),
+        confidence: clampConfidence(item.confidence, 0.8),
+      })),
+    rejected_items: rejected
+      .filter((item) => item?.name)
+      .map((item) => ({
+        name: String(item.name).trim(),
+        reason: String(item.reason || 'Not consistently supported by the scan').trim(),
+      })),
+  };
+}
+
+function applyVerificationPass(merged, verification) {
+  const verifiedMap = new Map();
+  verification.verified_items.forEach((item) => {
+    verifiedMap.set(canonicalizeName(item.name), item);
+    verifiedMap.set(canonicalizeName(item.canonical_name), item);
+  });
+
+  const rejectMap = new Map();
+  verification.rejected_items.forEach((item) => {
+    rejectMap.set(canonicalizeName(item.name), item.reason);
+  });
+
+  const verifiedItems = [];
+  const newUncertain = [...merged.uncertain_items];
+
+  merged.items.forEach((item) => {
+    const key = canonicalizeName(item.name);
+    const rejectedReason = rejectMap.get(key);
+    if (rejectedReason) {
+      newUncertain.unshift({
+        name: item.name,
+        emoji: item.emoji || '👀',
+        reason: rejectedReason,
+        confidence: Math.min(item.confidence, 0.49),
+        frame_index: item.frame_index ?? 0,
+        box: item.box || null,
+      });
+      return;
+    }
+
+    const verified = verifiedMap.get(key);
+    if (verified) {
+      item.name = verified.canonical_name || item.name;
+      item.category = verified.category || item.category;
+      item.emoji = pickEmoji(item.name, item.category);
+      item.confidence = Math.max(item.confidence, verified.confidence);
+    }
+    verifiedItems.push(item);
+  });
+
+  return {
+    ...merged,
+    items: verifiedItems,
+    uncertain_items: newUncertain,
+  };
+}
+
 async function callGroqVision(apiKey, frames, prompt) {
   const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
@@ -559,6 +627,38 @@ Return strict JSON:
   ]
 }`;
 
+    const verificationPrompt = (candidates) => `You are the verification pass for a ${location} inventory scan.
+
+You are given a candidate list produced by earlier passes. Your job is to confirm only the candidates that are clearly supported by the images and reject weak or duplicate guesses.
+
+Rules:
+- Use all images as evidence.
+- Prefer one canonical name for each real item.
+- Reject candidates that are likely duplicates of another stronger candidate.
+- Reject candidates that are not clearly visible enough to trust.
+- Keep this conservative.
+
+Candidate items:
+${candidates.map((item, index) => `${index + 1}. ${item.name} | ${item.category} | ${item.quantity || 'Visible in frame'}`).join('\n')}
+
+Return strict JSON:
+{
+  "verified_items": [
+    {
+      "name": "candidate name from the list",
+      "canonical_name": "best final name",
+      "category": "Dairy|Produce|Meat & Seafood|Beverages|Condiments & Sauces|Leftovers|Grains & Pantry|Snacks|Frozen|Other",
+      "confidence": 0.0
+    }
+  ],
+  "rejected_items": [
+    {
+      "name": "candidate name from the list",
+      "reason": "duplicate|not visible enough|too ambiguous"
+    }
+  ]
+}`;
+
     const groqApiKey = process.env.GROQ_API_KEY;
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -566,14 +666,26 @@ Return strict JSON:
       const primary = normalizeResponse(await callGroqVision(groqApiKey, normalizedFrames, prompt));
       const secondaryFrames = captureMode === 'photo' ? normalizedFrames : normalizedFrames.slice(0, Math.min(4, normalizedFrames.length));
       const readPass = normalizeReadPass(await callGroqVision(groqApiKey, secondaryFrames, cropReadPrompt));
-      return jsonResponse(mergeVisionPasses(primary, readPass), 200);
+      const merged = mergeVisionPasses(primary, readPass);
+      const verification = normalizeVerificationPass(await callGroqVision(
+        groqApiKey,
+        normalizedFrames,
+        verificationPrompt(merged.items.slice(0, 30))
+      ));
+      return jsonResponse(applyVerificationPass(merged, verification), 200);
     }
 
     if (anthropicApiKey) {
       const primary = normalizeResponse(await callAnthropicVision(anthropicApiKey, normalizedFrames, prompt));
       const secondaryFrames = captureMode === 'photo' ? normalizedFrames : normalizedFrames.slice(0, Math.min(4, normalizedFrames.length));
       const readPass = normalizeReadPass(await callAnthropicVision(anthropicApiKey, secondaryFrames, cropReadPrompt));
-      return jsonResponse(mergeVisionPasses(primary, readPass), 200);
+      const merged = mergeVisionPasses(primary, readPass);
+      const verification = normalizeVerificationPass(await callAnthropicVision(
+        anthropicApiKey,
+        normalizedFrames,
+        verificationPrompt(merged.items.slice(0, 30))
+      ));
+      return jsonResponse(applyVerificationPass(merged, verification), 200);
     }
 
     return jsonResponse({
