@@ -149,6 +149,8 @@ function normalizeResponse(payload) {
       emoji: item.emoji || '👀',
       reason: item.reason || 'Visible, but too unclear to confirm',
       confidence: clampConfidence(item.confidence, 0.4),
+      frame_index: Number.isInteger(item.frame_index) ? Math.max(0, Math.min(5, item.frame_index)) : 0,
+      box: normalizeBox(item.box),
     }))
     .forEach((item) => {
       const key = normalizeName(item.name);
@@ -380,7 +382,9 @@ Return ONLY valid JSON with exactly this structure:
       "name": "possible item",
       "emoji": "single emoji",
       "reason": "why it is uncertain",
-      "confidence": 0.0
+      "confidence": 0.0,
+      "frame_index": 0,
+      "box": { "x": 0, "y": 0, "w": 0, "h": 0 }
     }
   ],
   "shopping": [

@@ -63,14 +63,26 @@
     .empty-icon{width:100px;height:100px;border-radius:22px;background:linear-gradient(145deg, rgba(109,227,255,0.12), rgba(109,227,255,0.03));border:1px solid rgba(123,161,197,0.14);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:4px;box-shadow:var(--shadow)}
     .empty-state h2{font-size:18px;font-weight:600;color:var(--text)}
     .empty-state p{font-size:13px;color:var(--text-2);max-width:250px;line-height:1.55}
-    .scan-preview-wrap{margin-top:14px}
-    .scan-preview-frame{position:relative;border-radius:24px;overflow:hidden}
-    .scan-preview{width:100%;border-radius:18px;max-height:280px;object-fit:cover;border:1px solid rgba(123,161,197,0.14);display:block;box-shadow:var(--shadow)}
+    .scene-review{margin-top:14px;margin-bottom:14px}
+    .scene-shell{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(123,161,197,0.14);background:rgba(8,13,19,0.92);box-shadow:var(--shadow)}
+    .scene-image{width:100%;height:min(72vh, 620px);object-fit:cover;display:block}
+    .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);background-size:32px 32px;pointer-events:none}
     .scan-overlay{position:absolute;inset:0;pointer-events:none}
-    .scan-tag{position:absolute;border:1.5px solid rgba(109,227,255,0.95);border-radius:10px;background:rgba(109,227,255,0.08);box-shadow:inset 0 1px 0 rgba(255,255,255,0.08)}
-    .scan-tag span{position:absolute;top:-12px;left:8px;background:rgba(6,11,17,0.94);color:#fff;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:700;line-height:1;white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(109,227,255,0.2)}
-    .scan-meta{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:0.1em;padding:5px 2px 10px;text-transform:uppercase}
-    .rescan-btn{width:100%;height:42px;border-radius:12px;background:rgba(16,25,36,0.88);border:1px solid rgba(123,161,197,0.14);color:var(--text);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+    .scan-tag{position:absolute;border:1.5px solid rgba(109,227,255,0.95);border-radius:10px;background:rgba(109,227,255,0.06);box-shadow:0 0 0 1px rgba(109,227,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)}
+    .scan-tag.uncertain{border-color:rgba(255,184,77,0.95);background:rgba(255,184,77,0.06)}
+    .scan-tag-label{position:absolute;top:-14px;left:8px;background:rgba(6,11,17,0.96);color:#fff;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:700;line-height:1;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(109,227,255,0.24);display:flex;align-items:center;gap:6px}
+    .scan-tag.uncertain .scan-tag-label{border-color:rgba(255,184,77,0.28)}
+    .scan-tag-arrow{width:8px;height:8px;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);display:inline-block}
+    .scan-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(180deg, rgba(7,12,18,0.98), rgba(10,16,23,0.98));border-top:1px solid rgba(123,161,197,0.14)}
+    .scan-meta-copy{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase}
+    .scan-meta-stack{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .scan-chip{padding:7px 10px;border-radius:999px;background:rgba(14,21,31,0.88);border:1px solid rgba(123,161,197,0.14);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-2)}
+    .scan-chip.uncertain{color:var(--warn);border-color:rgba(255,184,77,0.2)}
+    .review-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}
+    .review-tile{padding:12px 12px 10px;border-radius:12px;background:rgba(16,25,36,0.86);border:1px solid rgba(123,161,197,0.14)}
+    .review-tile strong{display:block;font-size:16px;color:var(--text)}
+    .review-tile span{display:block;margin-top:4px;font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase}
+    .rescan-btn{width:100%;height:46px;border-radius:12px;background:rgba(16,25,36,0.88);border:1px solid rgba(123,161,197,0.14);color:var(--text);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02);text-transform:uppercase;letter-spacing:0.06em}
     .rescan-btn:active{border-color:var(--accent);color:var(--accent)}
     .category{margin-top:18px}
     .cat-header{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);padding:6px 0 8px;display:flex;align-items:center;gap:7px}
@@ -508,6 +520,7 @@ function render(){
   const cats=Object.keys(d.cats);
   const hasScanData=Boolean(cats.length||d.shopping.length||d.uncertain.length||d.summary||d.preview);
   const scanStamp=d.lastScanAt?new Date(d.lastScanAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'No scan yet';
+  const confirmedCount=cats.reduce((sum,cat)=>sum+d.cats[cat].length,0);
   if(!hasScanData){
     content.innerHTML=`<section class="hero-card"><div class="hero-kicker">Cold Chain Command</div><div class="hero-title">${LOC_META[state.loc].label} visibility without guesswork.</div><p class="hero-copy">Capture the space, audit what is actually visible, and promote only detections the system can justify from evidence.</p><div class="hero-stats"><div class="hero-stat"><strong>Photo</strong><span>wide plus crops</span></div><div class="hero-stat"><strong>Sweep</strong><span>6-view coverage</span></div><div class="hero-stat"><strong>Trust</strong><span>grounded labels</span></div></div></section><div class="empty-state"><div class="empty-icon">${LOC_META[state.loc].emoji}</div><h2>No scan on record</h2><p>Run a capture pass on your ${state.loc}. Wide framing is useful, but tight evidence wins.</p></div>`;
     return;
@@ -518,8 +531,8 @@ function render(){
     html+=`<section class="summary-card"><div class="summary-title">System Readout</div><div class="summary-copy">${escHtml(d.summary?.overview||'Inventory updated from your latest scan.')}</div><div class="summary-note">${escHtml(d.summary?.confidence_note||'Scan completed')} · ${escHtml(scanStamp)}</div></section>`;
   }
   if(d.preview){
-    const overlay=d.lastCaptureMode==='photo'?renderPreviewLabels(d):'';
-    html+=`<div class="scan-preview-wrap"><div class="scan-preview-frame"><img src="${d.preview}" class="scan-preview" alt="Scan">${overlay}</div><div class="scan-meta">⟳ Last scan · ${LOC_META[state.loc].label}${d.lastCaptureMode==='photo'?' · Label overlay enabled':''}</div></div>`;
+    const overlay=renderSceneLabels(d);
+    html+=`<section class="scene-review"><div class="scene-shell"><img src="${d.preview}" class="scene-image" alt="Scan">${overlay}<div class="scene-grid"></div></div><div class="scan-meta"><div><div class="scan-meta-copy">Scan Review · ${escHtml(LOC_META[state.loc].label)} · ${escHtml(scanStamp)}</div></div><div class="scan-meta-stack"><div class="scan-chip">${confirmedCount} confirmed</div><div class="scan-chip uncertain">${d.uncertain.length} unresolved</div><div class="scan-chip">${d.lastCaptureMode==='photo'?'photo evidence':'sweep evidence'}</div></div></div><div class="review-strip"><div class="review-tile"><strong>${confirmedCount}</strong><span>boxed items</span></div><div class="review-tile"><strong>${d.uncertain.length}</strong><span>question marks</span></div><div class="review-tile"><strong>${Math.max(confirmedCount+d.uncertain.length,0)}</strong><span>total traces</span></div></div></section>`;
   }
   html+=`<button class="rescan-btn" data-action="scan-again">📷 Scan again</button>`;
   cats.forEach(cat=>{
@@ -591,12 +604,15 @@ function showToast(msg,ms=2800){clearTimeout(toastTimer);toast.textContent=msg;t
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function enc(value){return encodeURIComponent(value)}
 function dec(value){return decodeURIComponent(value)}
-function renderPreviewLabels(d){
+function renderSceneLabels(d){
   const labels=[];
   Object.keys(d.cats).forEach(cat=>{
     d.cats[cat].forEach(item=>{
-      if(item?.box&&item.frame_index===0)labels.push(item);
+      if(item?.box&&item.frame_index===0)labels.push({...item,_kind:'confirmed'});
     });
+  });
+  d.uncertain.forEach(item=>{
+    if(item?.box&&item.frame_index===0)labels.push({...item,_kind:'uncertain'});
   });
   if(!labels.length)return '';
   return `<div class="scan-overlay">${labels.map(item=>{
@@ -604,7 +620,9 @@ function renderPreviewLabels(d){
     const top=(item.box.y/1000)*100;
     const width=(item.box.w/1000)*100;
     const height=(item.box.h/1000)*100;
-    return `<div class="scan-tag" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%"><span>${escHtml(item.name)}</span></div>`;
+    const uncertain=item._kind==='uncertain';
+    const label=uncertain?`? ${item.name||'Unknown item'}`:item.name;
+    return `<div class="scan-tag ${uncertain?'uncertain':''}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%"><div class="scan-tag-label"><span class="scan-tag-arrow"></span>${escHtml(label)}</div></div>`;
   }).join('')}</div>`;
 }
 content.addEventListener('click',e=>{
