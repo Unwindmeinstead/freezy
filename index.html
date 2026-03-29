@@ -271,8 +271,13 @@ async function analyzeImage(base64,preview){
     });
     if(!res.ok){
       const errText=await res.text();
+      let errMsg=`Error ${res.status} — try again`;
+      try{
+        const errJson=JSON.parse(errText);
+        errMsg=errJson.detail||errJson.error||errMsg;
+      }catch{}
       console.error('API error:',res.status,errText);
-      showToast('⚠️ Error '+res.status+' — try again');
+      showToast('⚠️ '+errMsg);
       analyzingOverlay.classList.remove('open');
       return;
     }
