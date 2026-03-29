@@ -92,6 +92,27 @@ function normalizeBox(box) {
   return clamped.w > 0 && clamped.h > 0 ? clamped : null;
 }
 
+function specificityScore(name) {
+  const value = String(name || '').trim();
+  if (!value) {
+    return 0;
+  }
+  return value.split(/\s+/).length * 10 + value.length;
+}
+
+function findMatchingKey(map, name) {
+  const target = normalizeName(name);
+  if (map.has(target)) {
+    return target;
+  }
+  for (const key of map.keys()) {
+    if (key.includes(target) || target.includes(key)) {
+      return key;
+    }
+  }
+  return null;
+}
+
 function normalizeResponse(payload) {
   const items = Array.isArray(payload?.items) ? payload.items : [];
   const uncertainItems = Array.isArray(payload?.uncertain_items) ? payload.uncertain_items : [];
@@ -160,6 +181,128 @@ function normalizeResponse(payload) {
       confidence_note: payload?.summary?.confidence_note || '',
     },
   };
+}
+
+function normalizeReadPass(payload) {
+  const reads = Array.isArray(payload?.reads) ? payload.reads : Array.isArray(payload?.items) ? payload.items : [];
+  return reads
+    .filter((item) => item?.name)
+    .map((item) => ({
+      name: String(item.name).trim(),
+      category: normalizeCategory(item.category),
+      emoji: item.emoji || '📦',
+      quantity: item.quantity || 'Visible in crop',
+      expiry_concern: ['none', 'soon', 'urgent'].includes(item.expiry_concern) ? item.expiry_concern : 'none',
+      confidence: clampConfidence(item.confidence, 0.72),
+      frame_index: Number.isInteger(item.frame_index) ? Math.max(0, Math.min(5, item.frame_index)) : 0,
+      box: normalizeBox(item.box),
+    }))
+    .filter((item) => item.confidence >= 0.74);
+}
+
+function mergeVisionPasses(primary, secondaryReads) {
+  const merged = {
+    items: [...primary.items],
+    uncertain_items: [...primary.uncertain_items],
+    shopping: [...primary.shopping],
+    summary: primary.summary,
+  };
+  const itemMap = new Map();
+  merged.items.forEach((item) => itemMap.set(normalizeName(item.name), item));
+
+  secondaryReads.forEach((read) => {
+    const matchKey = findMatchingKey(itemMap, read.name);
+    const existing = matchKey ? itemMap.get(matchKey) : null;
+    if (existing) {
+      if (specificityScore(read.name) > specificityScore(existing.name) && read.confidence >= existing.confidence - 0.03) {
+        existing.name = read.name;
+        existing.emoji = read.emoji || existing.emoji;
+        existing.category = read.category || existing.category;
+      }
+      if ((!existing.quantity || existing.quantity === 'Visible in frame') && read.quantity) {
+        existing.quantity = read.quantity;
+      }
+      if (!existing.box && read.frame_index === 0 && read.box) {
+        existing.box = read.box;
+      }
+      existing.confidence = Math.max(existing.confidence, read.confidence);
+      return;
+    }
+    merged.items.push(read);
+    itemMap.set(normalizeName(read.name), read);
+  });
+
+  merged.uncertain_items = merged.uncertain_items.filter((item) => !findMatchingKey(itemMap, item.name));
+  return merged;
+}
+
+async function callGroqVision(apiKey, frames, prompt) {
+  const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct',
+      temperature: 0,
+      max_tokens: 1000,
+      response_format: { type: 'json_object' },
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'text', text: prompt },
+          ...frames.map((frame) => ({
+            type: 'image_url',
+            image_url: { url: `data:image/jpeg;base64,${frame}` }
+          }))
+        ]
+      }]
+    })
+  });
+
+  if (!groqRes.ok) {
+    const err = await groqRes.text();
+    console.error('Groq error:', err);
+    throw new Error(`Groq API error: ${err}`);
+  }
+
+  const data = await groqRes.json();
+  return extractJsonObject(data.choices?.[0]?.message?.content || '{}');
+}
+
+async function callAnthropicVision(apiKey, frames, prompt) {
+  const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-20250514',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: [
+          ...frames.map((frame) => ({
+            type: 'image',
+            source: { type: 'base64', media_type: 'image/jpeg', data: frame }
+          })),
+          { type: 'text', text: prompt }
+        ]
+      }]
+    })
+  });
+
+  if (!anthropicRes.ok) {
+    const err = await anthropicRes.text();
+    console.error('Anthropic error:', err);
+    throw new Error(`Anthropic API error: ${err}`);
+  }
+
+  const data = await anthropicRes.json();
+  return extractJsonObject(data.content?.[0]?.text || '{}');
 }
 
 export default async function handler(req) {
@@ -261,82 +404,51 @@ Confidence rules:
 
 Return strict JSON only.`;
 
+    const cropReadPrompt = `You are doing a second-pass read on images from a ${location} inventory scan.
+
+Goal:
+- Recover small items, label text, and more specific product names from close-up support images.
+- Be conservative. This pass should improve specificity, not invent groceries.
+
+Rules:
+- The first image may be the wide reference frame. Remaining images may be crops or additional sweep views.
+- Return only items you can see well enough to name confidently.
+- Prefer a more specific name when text or packaging makes it clear.
+- Do not repeat the same item multiple times under slightly different names.
+- If you cannot tell, omit it.
+- If the item is visible on frame 0, include a normalized 0..1000 "box". Otherwise use null.
+
+Return strict JSON:
+{
+  "reads": [
+    {
+      "name": "specific visible item name",
+      "category": "Dairy|Produce|Meat & Seafood|Beverages|Condiments & Sauces|Leftovers|Grains & Pantry|Snacks|Frozen|Other",
+      "emoji": "single emoji",
+      "quantity": "brief visible estimate",
+      "expiry_concern": "none|soon|urgent",
+      "confidence": 0.0,
+      "frame_index": 0,
+      "box": { "x": 0, "y": 0, "w": 0, "h": 0 }
+    }
+  ]
+}`;
+
     const groqApiKey = process.env.GROQ_API_KEY;
     const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
 
     if (groqApiKey) {
-      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${groqApiKey}`,
-        },
-        body: JSON.stringify({
-          model: process.env.GROQ_MODEL || 'meta-llama/llama-4-scout-17b-16e-instruct',
-          temperature: 0,
-          max_tokens: 1000,
-          response_format: { type: 'json_object' },
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'text', text: prompt },
-              ...normalizedFrames.map((frame) => ({
-                type: 'image_url',
-                image_url: { url: `data:image/jpeg;base64,${frame}` }
-              }))
-            ]
-          }]
-        })
-      });
-
-      if (!groqRes.ok) {
-        const err = await groqRes.text();
-        console.error('Groq error:', err);
-        return jsonResponse({ error: 'Groq API error', detail: err }, 500);
-      }
-
-      const data = await groqRes.json();
-      const raw = data.choices?.[0]?.message?.content || '{}';
-      return jsonResponse(normalizeResponse(extractJsonObject(raw)), 200);
+      const primary = normalizeResponse(await callGroqVision(groqApiKey, normalizedFrames, prompt));
+      const secondaryFrames = captureMode === 'photo' ? normalizedFrames : normalizedFrames.slice(0, Math.min(4, normalizedFrames.length));
+      const readPass = normalizeReadPass(await callGroqVision(groqApiKey, secondaryFrames, cropReadPrompt));
+      return jsonResponse(mergeVisionPasses(primary, readPass), 200);
     }
 
     if (anthropicApiKey) {
-      const anthropicRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': anthropicApiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: process.env.ANTHROPIC_MODEL || 'claude-opus-4-20250514',
-          max_tokens: 1000,
-          messages: [{
-            role: 'user',
-            content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: 'image/jpeg', data: normalizedFrames[0] }
-              },
-              ...normalizedFrames.slice(1).map((frame) => ({
-                type: 'image',
-                source: { type: 'base64', media_type: 'image/jpeg', data: frame }
-              })),
-              { type: 'text', text: prompt }
-            ]
-          }]
-        })
-      });
-
-      if (!anthropicRes.ok) {
-        const err = await anthropicRes.text();
-        console.error('Anthropic error:', err);
-        return jsonResponse({ error: 'Anthropic API error', detail: err }, 500);
-      }
-
-      const data = await anthropicRes.json();
-      const raw = data.content?.[0]?.text || '{}';
-      return jsonResponse(normalizeResponse(extractJsonObject(raw)), 200);
+      const primary = normalizeResponse(await callAnthropicVision(anthropicApiKey, normalizedFrames, prompt));
+      const secondaryFrames = captureMode === 'photo' ? normalizedFrames : normalizedFrames.slice(0, Math.min(4, normalizedFrames.length));
+      const readPass = normalizeReadPass(await callAnthropicVision(anthropicApiKey, secondaryFrames, cropReadPrompt));
+      return jsonResponse(mergeVisionPasses(primary, readPass), 200);
     }
 
     return jsonResponse({
