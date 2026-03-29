@@ -153,7 +153,7 @@ export default async function handler(req) {
     const body = await req.json();
     const { base64, frames, location } = body;
     const normalizedFrames = Array.isArray(frames)
-      ? frames.filter((frame) => typeof frame === 'string' && frame.length > 100).slice(0, 4)
+      ? frames.filter((frame) => typeof frame === 'string' && frame.length > 100).slice(0, 6)
       : [];
     if (!normalizedFrames.length && typeof base64 === 'string' && base64.length > 100) {
       normalizedFrames.push(base64);
@@ -168,12 +168,16 @@ export default async function handler(req) {
 Your first job is TRUST, not completeness.
 
 Rules:
-- The input may contain 1 to 4 images from the same ${location}. Use all frames together, but deduplicate the final result.
+- The input may contain 1 to 6 images from the same ${location}. Use all frames together as one inventory pass, and deduplicate the final result.
+- Treat different frames as different coverage zones of the same space. If an item is clear in one frame and absent in another, it still counts.
+- Look carefully at front rows, rear rows, door shelves, produce drawers, freezer bins, and partially occluded areas when visible.
+- Prefer specific packaged food names when labels are readable. If not readable, use a truthful generic label like "yogurt cups" or "green condiment bottle".
 - Only include items that are clearly and directly visible in at least one frame.
 - Do NOT infer hidden items, likely groceries, or common household staples.
 - Do NOT guess based on context, shelf type, packaging color, or what "should" be in a ${location}.
 - If a container is too blurry, occluded, too far away, or partially visible, do not promote it to confirmed inventory.
 - Put ambiguous detections into uncertain_items instead.
+- If there are several similar visible units, consolidate them into one item with an honest quantity estimate.
 - shopping suggestions must only come from clearly visible low stock, obvious emptiness, or clearly missing basics implied by visible meal ingredients. If that evidence is not strong, return an empty shopping array.
 - If the image quality is poor, it is acceptable to return zero confirmed items.
 

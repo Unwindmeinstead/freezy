@@ -4,72 +4,74 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Freezy</title>
-  <meta name="theme-color" content="#08080f">
+  <meta name="theme-color" content="#efe7db">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:#08080f;--surface:#0f0f1a;--surface-2:#161624;--surface-3:#1e1e2e;
-      --border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.12);
-      --accent:#00e0a0;--accent-dim:rgba(0,224,160,0.1);--accent-glow:rgba(0,224,160,0.25);
-      --warn:#ffb347;--danger:#ff5f5f;--text:#ebebf5;--text-2:#8888aa;--text-3:#555570;
-      --mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;--r:14px;--r-sm:10px;
+      --bg:#efe7db;--bg-deep:#d7ccb9;--surface:rgba(255,252,247,0.78);--surface-2:rgba(247,240,230,0.92);--surface-3:#f3eadf;
+      --border:rgba(23,22,26,0.1);--border-2:rgba(23,22,26,0.18);
+      --accent:#0e7a5f;--accent-dim:rgba(14,122,95,0.1);--accent-glow:rgba(14,122,95,0.18);
+      --warn:#cb7a18;--danger:#c44e3b;--text:#17161a;--text-2:#58545d;--text-3:#817b84;
+      --mono:'Space Grotesk',sans-serif;--sans:'Manrope',sans-serif;--r:18px;--r-sm:14px;--shadow:0 22px 60px rgba(43,31,16,0.12);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     html{height:100%;background:
-      radial-gradient(circle at top, rgba(0,224,160,0.12), transparent 32%),
-      linear-gradient(180deg, #0b0b12 0%, #08080f 28%, #050509 100%)}
+      radial-gradient(circle at top left, rgba(255,255,255,0.84), transparent 28%),
+      radial-gradient(circle at top right, rgba(14,122,95,0.08), transparent 32%),
+      linear-gradient(180deg, var(--bg) 0%, #ece1d1 100%)}
     body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;background:transparent;color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
     body.modal-open{overflow:hidden;touch-action:none}
     body::before{content:'';position:fixed;inset:0;background:
-      radial-gradient(ellipse 80% 40% at 50% -10%,rgba(0,224,160,0.08) 0%,transparent 60%),
-      radial-gradient(circle at 10% 20%, rgba(255,255,255,0.04), transparent 24%);
+      radial-gradient(ellipse 80% 40% at 50% -10%,rgba(255,255,255,0.45) 0%,transparent 60%),
+      radial-gradient(circle at 10% 20%, rgba(14,122,95,0.06), transparent 24%);
       pointer-events:none;z-index:0}
-    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);background-size:28px 28px;mask-image:linear-gradient(180deg, rgba(0,0,0,0.28), transparent 72%);pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px);background-size:30px 30px;mask-image:linear-gradient(180deg, rgba(0,0,0,0.2), transparent 72%);pointer-events:none;z-index:0;opacity:0.22}
     #app{display:flex;flex-direction:column;min-height:100dvh;max-width:430px;margin:0 auto;position:relative;z-index:1;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
-    header{height:68px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,15,0.78);backdrop-filter:blur(18px);z-index:5}
-    .logo{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase}
-    .logo-fridge{color:var(--accent)}.logo-ai{color:var(--text-3)}
+    header{height:74px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid rgba(255,255,255,0.65);position:sticky;top:0;background:rgba(239,231,219,0.72);backdrop-filter:blur(18px);z-index:5}
+    .logo{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase}
+    .logo-fridge{color:var(--text)}.logo-ai{color:var(--accent)}
     .header-right{display:flex;gap:8px;align-items:center}
-    .loc-pill{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,224,160,0.2);padding:4px 10px;border-radius:20px}
-    .icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);transition:all 0.15s;flex-shrink:0}
+    .loc-pill{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text);background:rgba(255,255,255,0.52);border:1px solid rgba(255,255,255,0.7);padding:7px 12px;border-radius:999px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.8)}
+    .icon-btn{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.52);border:1px solid rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);transition:all 0.15s;flex-shrink:0;box-shadow:inset 0 1px 0 rgba(255,255,255,0.82)}
     .icon-btn:active{transform:scale(0.9);color:var(--accent)}
-    .tab-bar{display:flex;padding:14px 20px 12px;gap:8px;flex-shrink:0;position:sticky;top:68px;background:linear-gradient(180deg, rgba(8,8,15,0.96), rgba(8,8,15,0.84));backdrop-filter:blur(16px);z-index:4}
-    .tab{flex:1;height:40px;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--text-3);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px}
-    .tab.active{background:linear-gradient(180deg, rgba(0,224,160,0.16), rgba(0,224,160,0.08));border-color:rgba(0,224,160,0.35);color:var(--accent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)}
+    .tab-bar{display:flex;padding:14px 20px 12px;gap:10px;flex-shrink:0;position:sticky;top:74px;background:linear-gradient(180deg, rgba(239,231,219,0.92), rgba(239,231,219,0.72));backdrop-filter:blur(16px);z-index:4}
+    .tab{flex:1;height:46px;border-radius:24px;border:1px solid rgba(255,255,255,0.72);background:rgba(255,255,255,0.48);color:var(--text-2);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.8)}
+    .tab.active{background:linear-gradient(135deg, var(--text) 0%, #2a2a31 100%);border-color:var(--text);color:#fff;box-shadow:0 12px 30px rgba(23,22,26,0.14)}
     .content{flex:1;min-height:0;overflow:visible;padding:8px 20px 24px}
     .content::-webkit-scrollbar{display:none}
-    .hero-card,.summary-card,.uncertain-card{padding:20px;border:1px solid var(--border);border-radius:22px;background:linear-gradient(180deg, rgba(19,19,31,0.94), rgba(11,11,19,0.94));box-shadow:0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);margin-bottom:16px}
-    .hero-kicker{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
-    .hero-title{font-size:27px;line-height:1.05;font-weight:600;letter-spacing:-0.03em;margin-bottom:10px;max-width:260px}
-    .hero-copy{font-size:13px;color:var(--text-2);line-height:1.6;max-width:300px}
+    .hero-card,.summary-card,.uncertain-card{padding:22px;border:1px solid rgba(255,255,255,0.72);border-radius:28px;background:linear-gradient(145deg, rgba(255,250,242,0.88), rgba(249,240,229,0.78));box-shadow:var(--shadow);margin-bottom:16px;backdrop-filter:blur(18px)}
+    .hero-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+    .hero-title{font-family:var(--mono);font-size:31px;line-height:0.98;font-weight:700;letter-spacing:-0.04em;margin-bottom:10px;max-width:280px}
+    .hero-copy{font-size:14px;color:var(--text-2);line-height:1.58;max-width:320px}
     .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
-    .hero-stat{padding:12px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04)}
+    .hero-stat{padding:14px;border-radius:18px;background:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.7);box-shadow:inset 0 1px 0 rgba(255,255,255,0.82)}
     .hero-stat strong{display:block;font-size:16px;font-weight:600;color:var(--text)}
     .hero-stat span{display:block;font-size:10px;font-family:var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
     .summary-title,.uncertain-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
     .summary-copy,.uncertain-copy{font-size:13px;color:var(--text-2);line-height:1.6}
     .summary-note{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3)}
     .uncertain-list{display:grid;gap:8px;margin-top:12px}
-    .uncertain-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04)}
+    .uncertain-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,0.48);border:1px solid rgba(255,255,255,0.68)}
     .uncertain-icon{font-size:20px;flex-shrink:0}
     .uncertain-meta{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase;margin-top:4px}
     .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:48dvh;gap:14px;text-align:center;padding:26px 0 8px}
-    .empty-icon{width:100px;height:100px;border-radius:28px;background:linear-gradient(180deg, rgba(26,26,39,0.94), rgba(15,15,26,0.94));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:4px;box-shadow:0 18px 40px rgba(0,0,0,0.3)}
+    .empty-icon{width:100px;height:100px;border-radius:28px;background:linear-gradient(145deg, rgba(14,122,95,0.16), rgba(14,122,95,0.04));border:1px solid rgba(255,255,255,0.72);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:4px;box-shadow:var(--shadow)}
     .empty-state h2{font-size:18px;font-weight:600;color:var(--text)}
     .empty-state p{font-size:13px;color:var(--text-2);max-width:250px;line-height:1.55}
     .scan-preview-wrap{margin-top:14px}
-    .scan-preview{width:100%;border-radius:var(--r);max-height:150px;object-fit:cover;border:1px solid var(--border);display:block}
+    .scan-preview{width:100%;border-radius:24px;max-height:180px;object-fit:cover;border:1px solid rgba(255,255,255,0.72);display:block;box-shadow:var(--shadow)}
     .scan-meta{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:0.1em;padding:5px 2px 10px;text-transform:uppercase}
-    .rescan-btn{width:100%;height:36px;border-radius:18px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-family:var(--sans);font-size:12px;cursor:pointer;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s}
+    .rescan-btn{width:100%;height:42px;border-radius:21px;background:rgba(255,255,255,0.56);border:1px solid rgba(255,255,255,0.72);color:var(--text);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.82)}
     .rescan-btn:active{border-color:var(--accent);color:var(--accent)}
     .category{margin-top:18px}
     .cat-header{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);padding:6px 0 8px;display:flex;align-items:center;gap:7px}
     .cat-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
-    .item-card{background:linear-gradient(180deg, rgba(19,19,29,0.96), rgba(14,14,24,0.96));border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:7px;animation:slideIn 0.2s ease both;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+    .item-card{background:rgba(255,255,255,0.58);border:1px solid rgba(255,255,255,0.74);border-radius:20px;padding:14px;display:flex;align-items:center;gap:11px;margin-bottom:8px;animation:slideIn 0.2s ease both;box-shadow:inset 0 1px 0 rgba(255,255,255,0.82)}
     @keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     .item-emoji{font-size:20px;width:32px;text-align:center;flex-shrink:0}
     .item-info{flex:1;min-width:0}
@@ -80,62 +82,71 @@
     .ex-urgent{background:rgba(255,95,95,0.12);color:var(--danger);border:1px solid rgba(255,95,95,0.25)}
     .del-btn{width:26px;height:26px;border-radius:50%;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all 0.15s;flex-shrink:0}
     .del-btn:active{background:rgba(255,95,95,0.15);color:var(--danger);border-color:rgba(255,95,95,0.4)}
-    .add-row{border:1px dashed var(--border-2);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer;color:var(--text-3);font-size:12px;transition:all 0.15s}
+    .add-row{border:1px dashed var(--border-2);border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;color:var(--text-2);font-size:12px;font-weight:700;transition:all 0.15s;background:rgba(255,255,255,0.34)}
     .add-row:active{border-color:var(--accent);color:var(--accent)}
     .add-input-row{display:flex;gap:8px;margin-bottom:7px}
-    .add-input{flex:1;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none}
+    .add-input{flex:1;background:rgba(255,255,255,0.62);border:1px solid rgba(14,122,95,0.3);border-radius:18px;padding:12px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none}
     .add-input::placeholder{color:var(--text-3)}
     .add-ok{width:42px;flex-shrink:0;background:var(--accent);border:none;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#08080f}
     .shop-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--border)}
     .section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-2);margin-bottom:10px}
-    .shop-item{display:flex;align-items:center;gap:11px;padding:11px 14px;background:linear-gradient(180deg, rgba(19,19,29,0.96), rgba(14,14,24,0.96));border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;transition:opacity 0.2s}
+    .shop-item{display:flex;align-items:center;gap:11px;padding:12px 14px;background:rgba(255,255,255,0.58);border:1px solid rgba(255,255,255,0.74);border-radius:20px;margin-bottom:8px;transition:opacity 0.2s}
     .shop-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--border-2);cursor:pointer;transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
     .shop-check.checked{background:var(--accent);border-color:var(--accent)}
     .shop-name{font-size:13px;color:var(--text);flex:1}
     .shop-del{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:2px;transition:color 0.15s}
     .shop-del:active{color:var(--danger)}
-    .fab-wrap{position:sticky;bottom:0;left:0;right:0;padding:16px 20px 10px;background:linear-gradient(to top, rgba(8,8,15,0.98) 58%, rgba(8,8,15,0.58) 80%, transparent);pointer-events:none;margin-top:auto;z-index:3}
-    .fab{width:100%;height:56px;border-radius:28px;background:linear-gradient(180deg, #22f2b4 0%, #00e0a0 100%);color:#08080f;font-family:var(--sans);font-size:15px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;pointer-events:all;transition:all 0.2s;box-shadow:0 16px 40px rgba(0,224,160,0.22), inset 0 1px 0 rgba(255,255,255,0.32);letter-spacing:0.02em}
+    .fab-wrap{position:sticky;bottom:0;left:0;right:0;padding:16px 20px 10px;background:linear-gradient(to top, rgba(239,231,219,0.96) 58%, rgba(239,231,219,0.68) 80%, transparent);pointer-events:none;margin-top:auto;z-index:3}
+    .fab{width:100%;height:60px;border-radius:30px;background:linear-gradient(135deg, var(--text) 0%, #2a2a31 100%);color:#fff;font-family:var(--sans);font-size:15px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;pointer-events:all;transition:all 0.2s;box-shadow:0 18px 40px rgba(55,41,23,0.12);letter-spacing:0.02em}
     .fab:active{transform:scale(0.97);box-shadow:0 0 14px var(--accent-glow)}
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:100;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.25s, visibility 0.25s}
+    .overlay{position:fixed;inset:0;background:rgba(16,14,12,0.4);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:100;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.25s, visibility 0.25s}
     .overlay.open{opacity:1;pointer-events:all;visibility:visible}
-    .sheet{width:100%;max-width:430px;background:var(--surface-2);border-radius:24px 24px 0 0;padding:20px 20px 44px;transform:translateY(30px);transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1);border-top:1px solid var(--border)}
+    .sheet{width:100%;max-width:430px;background:rgba(255,250,242,0.92);border-radius:30px 30px 0 0;padding:22px 20px 44px;transform:translateY(30px);transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1);border-top:1px solid rgba(255,255,255,0.82);box-shadow:var(--shadow)}
     .overlay.open .sheet{transform:translateY(0)}
-    .handle{width:34px;height:4px;border-radius:2px;background:var(--surface-3);margin:0 auto 18px}
-    .sheet-title{font-size:16px;font-weight:600;text-align:center;margin-bottom:20px;color:var(--text)}
+    .handle{width:42px;height:5px;border-radius:999px;background:rgba(23,22,26,0.12);margin:0 auto 18px}
+    .sheet-title{font-family:var(--mono);font-size:22px;font-weight:700;text-align:left;margin-bottom:8px;color:var(--text)}
+    .sheet-copy{font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:18px}
     .capture-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .cap-opt{background:var(--surface-3);border:1px solid var(--border);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s}
+    .cap-opt{background:rgba(255,255,255,0.52);border:1px solid rgba(255,255,255,0.74);border-radius:22px;padding:22px 16px;text-align:left;cursor:pointer;transition:all 0.2s;box-shadow:inset 0 1px 0 rgba(255,255,255,0.82)}
     .cap-opt:active{border-color:var(--accent);background:var(--accent-dim)}
     .cap-opt-icon{font-size:34px;margin-bottom:6px}
     .cap-opt-label{font-size:14px;font-weight:500;color:var(--text)}
     .cap-opt-sub{font-size:11px;color:var(--text-3);margin-top:3px}
-    .camera-modal{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.2s, visibility 0.2s}
+    .camera-modal{position:fixed;inset:0;background:#111;z-index:200;display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.2s, visibility 0.2s}
     .camera-modal.open{opacity:1;pointer-events:all;visibility:visible}
     .cam-view{flex:1;position:relative;overflow:hidden}
     #videoEl{width:100%;height:100%;object-fit:cover;display:block}
-    .cam-top{position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
-    .cam-close{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:white}
-    .rec-badge{display:none;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:#fff;background:rgba(255,95,95,0.8);padding:4px 10px;border-radius:20px}
+    .cam-top{position:absolute;top:0;left:0;right:0;padding:18px 20px;display:flex;align-items:center;justify-content:space-between}
+    .cam-close{width:46px;height:46px;border-radius:50%;background:rgba(0,0,0,0.34);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:white}
+    .camera-chip,.rec-badge{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:#fff;background:rgba(255,255,255,0.18);padding:8px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.18)}
+    .rec-badge{display:none;background:rgba(196,78,59,0.86)}
     .rec-badge.on{display:flex}
     .rec-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite}
     @keyframes blink{50%{opacity:0}}
     .cam-bottom{position:absolute;bottom:0;left:0;right:0;padding:20px 24px 48px}
-    .cam-hint{text-align:center;font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--mono);margin-bottom:20px;letter-spacing:0.05em}
+    .cam-hint{text-align:left;font-size:15px;color:rgba(255,255,255,0.9);font-weight:600;line-height:1.45;margin-bottom:8px}
+    .cam-subhint{font-size:12px;color:rgba(255,255,255,0.62);line-height:1.5}
+    .cam-progress{display:flex;align-items:center;justify-content:space-between;margin:14px 0 18px;gap:12px}
+    .cam-count{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:0.08em;text-transform:uppercase}
+    .cam-strip{display:flex;gap:6px}
+    .cam-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.22);border:1px solid rgba(255,255,255,0.18)}
+    .cam-dot.on{background:#fff}
     .cam-controls{display:flex;align-items:center;justify-content:center;gap:48px}
-    .shutter{width:68px;height:68px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,0.35);cursor:pointer;transition:all 0.12s;outline:none}
+    .shutter{width:78px;height:78px;border-radius:50%;background:white;border:6px solid rgba(255,255,255,0.3);cursor:pointer;transition:all 0.12s;outline:none}
     .shutter.rec{background:var(--danger);border-color:rgba(255,95,95,0.4)}
     .shutter:disabled{opacity:0.45;cursor:not-allowed}
     .shutter:active{transform:scale(0.9)}
-    .analyzing{position:fixed;inset:0;background:rgba(8,8,15,0.96);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.3s, visibility 0.3s}
+    .analyzing{position:fixed;inset:0;background:rgba(21,17,14,0.54);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.3s, visibility 0.3s}
     .analyzing.open{opacity:1;pointer-events:all;visibility:visible}
-    .spin-wrap{width:110px;height:110px;position:relative;display:flex;align-items:center;justify-content:center}
-    .spin-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--surface-3)}
-    .spin-ring::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;border-top-color:var(--accent);animation:spin 0.9s linear infinite}
+    .analyzing-shell{width:min(360px,100%);border-radius:30px;background:rgba(255,250,242,0.92);border:1px solid rgba(255,255,255,0.82);padding:26px 22px;text-align:center;box-shadow:var(--shadow)}
+    .spin-wrap{width:104px;height:104px;border-radius:32px;background:linear-gradient(145deg, rgba(14,122,95,0.16), rgba(14,122,95,0.04));margin:0 auto 18px;position:relative;display:flex;align-items:center;justify-content:center}
+    .spin-ring{position:absolute;inset:-10px;border-radius:38px;border:1px solid rgba(14,122,95,0.18)}
+    .spin-ring::after{content:'';position:absolute;inset:0;border-radius:inherit;border:2px solid transparent;border-top-color:var(--accent);animation:spin 0.9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .spin-emoji{font-size:44px}
-    .analyzing-label{font-family:var(--mono);font-size:12px;color:var(--text-2);letter-spacing:0.12em}
-    .analyzing-sub{font-size:11px;color:var(--text-3);font-family:var(--mono);letter-spacing:0.08em}
-    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface-2);border:1px solid var(--border-2);border-radius:20px;padding:9px 18px;font-size:13px;color:var(--text);z-index:500;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none;max-width:min(90vw, 360px);overflow:hidden;text-overflow:ellipsis}
+    .analyzing-label{font-family:var(--mono);font-size:24px;color:var(--text);letter-spacing:-0.02em;font-weight:700}
+    .analyzing-sub{font-size:13px;color:var(--text-2);font-family:var(--sans);letter-spacing:0;line-height:1.55}
+    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(12px);background:rgba(27,24,22,0.92);border:1px solid rgba(255,255,255,0.08);border-radius:999px;padding:12px 18px;font-size:13px;color:#fff;z-index:500;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none;max-width:min(90vw, 360px);overflow:hidden;text-overflow:ellipsis}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     #captureCanvas{display:none}
     @media (max-width:430px){
@@ -178,17 +189,18 @@
 <div class="overlay" id="captureOverlay">
   <div class="sheet">
     <div class="handle"></div>
-    <div class="sheet-title">How do you want to scan?</div>
+    <div class="sheet-title">Capture with intention</div>
+    <div class="sheet-copy">Use photo for one shelf or drawer. Use sweep capture when you need broader coverage across a fuller space.</div>
     <div class="capture-grid">
       <div class="cap-opt" id="photoOpt">
         <div class="cap-opt-icon">📷</div>
-        <div class="cap-opt-label">Photo</div>
-        <div class="cap-opt-sub">Quick snap</div>
+        <div class="cap-opt-label">Photo capture</div>
+        <div class="cap-opt-sub">Fastest. Best when the whole shelf fits in one frame.</div>
       </div>
       <div class="cap-opt" id="videoOpt">
         <div class="cap-opt-icon">🎥</div>
-        <div class="cap-opt-label">Video</div>
-        <div class="cap-opt-sub">Sweep around</div>
+        <div class="cap-opt-label">Sweep capture</div>
+        <div class="cap-opt-sub">Captures multiple frames so labels across the space are less likely to get missed.</div>
       </div>
     </div>
   </div>
@@ -204,27 +216,32 @@
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
+      <div class="camera-chip" id="cameraChip">Photo mode</div>
       <div class="rec-badge" id="recBadge"><div class="rec-dot"></div> REC</div>
-      <div style="width:40px"></div>
     </div>
     <div class="cam-bottom">
       <div class="cam-hint" id="camHint"></div>
+      <div class="cam-subhint" id="camSubHint"></div>
+      <div class="cam-progress">
+        <div class="cam-count" id="captureCount">0 of 6 frames</div>
+        <div class="cam-strip" id="captureStrip"></div>
+      </div>
       <div class="cam-controls">
-        <div style="width:40px"></div>
         <button class="shutter" id="shutterBtn"></button>
-        <div style="width:40px"></div>
       </div>
     </div>
   </div>
 </div>
 
 <div class="analyzing" id="analyzingOverlay">
-  <div class="spin-wrap">
-    <div class="spin-ring"></div>
-    <div class="spin-emoji" id="spinEmoji">🧊</div>
+  <div class="analyzing-shell">
+    <div class="spin-wrap">
+      <div class="spin-ring"></div>
+      <div class="spin-emoji" id="spinEmoji">🧊</div>
+    </div>
+    <div class="analyzing-label">Building a trustworthy inventory</div>
+    <div class="analyzing-sub" id="analyzingCopy">Freezy is comparing multiple views so it can promote only clearly visible items into inventory.</div>
   </div>
-  <div class="analyzing-label">Analyzing contents...</div>
-  <div class="analyzing-sub">Powered by AI vision</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -235,9 +252,10 @@ const defaultBucket=()=>({cats:{},shopping:[],preview:null,uncertain:[],summary:
 const defaultData=()=>({fridge:defaultBucket(),freezer:defaultBucket(),pantry:defaultBucket()});
 const storedState=loadState();
 const safeLoc=storedState?.loc&&['fridge','freezer','pantry'].includes(storedState.loc)?storedState.loc:'fridge';
+const MAX_CAPTURE_FRAMES=6;
 const state={loc:safeLoc,data:hydrateData(storedState?.data),captureMode:'photo',stream:null,isRecording:false,captureFrames:[],captureTimer:null,cameraReady:false};
 const $=id=>document.getElementById(id);
-const content=$('content'),captureOverlay=$('captureOverlay'),cameraModal=$('cameraModal'),analyzingOverlay=$('analyzingOverlay'),videoEl=$('videoEl'),canvas=$('captureCanvas'),toast=$('toast'),recBadge=$('recBadge'),shutterBtn=$('shutterBtn'),camHint=$('camHint'),locPill=$('locPill'),spinEmoji=$('spinEmoji');
+const content=$('content'),captureOverlay=$('captureOverlay'),cameraModal=$('cameraModal'),analyzingOverlay=$('analyzingOverlay'),videoEl=$('videoEl'),canvas=$('captureCanvas'),toast=$('toast'),recBadge=$('recBadge'),shutterBtn=$('shutterBtn'),camHint=$('camHint'),camSubHint=$('camSubHint'),cameraChip=$('cameraChip'),captureCount=$('captureCount'),captureStrip=$('captureStrip'),locPill=$('locPill'),spinEmoji=$('spinEmoji'),analyzingCopy=$('analyzingCopy');
 const LOC_META={fridge:{label:'Fridge',emoji:'🧊'},freezer:{label:'Freezer',emoji:'❄️'},pantry:{label:'Pantry',emoji:'🥫'}};
 function curData(){return state.data[state.loc]}
 function hydrateData(input){
@@ -300,12 +318,17 @@ function setShutterReady(isReady){
   state.cameraReady=isReady;
   shutterBtn.disabled=!isReady;
 }
+function renderCaptureProgress(){
+  if(captureCount)captureCount.textContent=`${state.captureFrames.length} of ${MAX_CAPTURE_FRAMES} frames`;
+  if(captureStrip)captureStrip.innerHTML=Array.from({length:MAX_CAPTURE_FRAMES},(_,i)=>`<div class="cam-dot ${i<state.captureFrames.length?'on':''}"></div>`).join('');
+}
 function resetCaptureSession(){
   state.captureFrames=[];
   if(state.captureTimer){clearInterval(state.captureTimer);state.captureTimer=null}
   state.isRecording=false;
   recBadge.classList.remove('on');
   shutterBtn.classList.remove('rec');
+  renderCaptureProgress();
 }
 async function getCameraStream(){
   const attempts=[
@@ -326,7 +349,10 @@ async function startCamera(){
     resetCaptureSession();
     state.stream=await getCameraStream();
     videoEl.srcObject=state.stream;
-    camHint.textContent=state.captureMode==='photo'?`Frame your ${state.loc} and wait for the shutter to arm`:`Sweep slowly across your ${state.loc} after the shutter arms`;
+    cameraChip.textContent=state.captureMode==='photo'?'Photo mode':'Sweep mode';
+    camHint.textContent=state.captureMode==='photo'?`Frame one shelf of your ${state.loc} tightly and wait for the shutter to arm.`:`Sweep slowly across your ${state.loc} so labels and rear rows each get a clear pass.`;
+    camSubHint.textContent=state.captureMode==='photo'?'Closer framing beats wide framing. Large labels and full containers scan best.':'Freezy will sample multiple frames for coverage. Pause briefly on crowded areas.';
+    analyzingCopy.textContent=`Freezy is reviewing your ${state.loc} from multiple views so only clearly visible items get promoted into inventory.`;
     cameraModal.classList.add('open');
     syncBodyLock();
     await videoEl.play().catch(()=>{});
@@ -372,18 +398,26 @@ function beginVideoCapture(){
   state.captureFrames=[];
   shutterBtn.classList.add('rec');
   recBadge.classList.add('on');
-  camHint.textContent=`Sweeping ${state.loc}... tap again to finish`;
+  camHint.textContent=`Sweeping ${state.loc}... keep moving slowly, then tap again to finish.`;
+  camSubHint.textContent='Try to give each shelf, door bin, and back row a brief stable moment.';
   const sample=()=>{
     const frame=captureCurrentFrame(0.6);
-    if(frame&&state.captureFrames.length<4)state.captureFrames.push(frame);
+    if(frame&&state.captureFrames.length<MAX_CAPTURE_FRAMES){
+      state.captureFrames.push(frame);
+      renderCaptureProgress();
+    }
+    if(state.captureFrames.length>=MAX_CAPTURE_FRAMES)finishVideoCapture();
   };
   sample();
-  state.captureTimer=setInterval(sample,900);
+  state.captureTimer=setInterval(sample,650);
 }
 function finishVideoCapture(){
   const fallbackFrame=captureCurrentFrame(0.6);
-  if(fallbackFrame&&state.captureFrames.length<4)state.captureFrames.push(fallbackFrame);
-  const frames=state.captureFrames.slice(0,4);
+  if(fallbackFrame&&state.captureFrames.length<MAX_CAPTURE_FRAMES){
+    state.captureFrames.push(fallbackFrame);
+    renderCaptureProgress();
+  }
+  const frames=state.captureFrames.slice(0,MAX_CAPTURE_FRAMES);
   const preview=frames[frames.length-1]?.preview;
   stopCamera();
   if(!frames.length){showToast('⚠️ No usable frames captured');return}
@@ -426,7 +460,7 @@ async function analyzeImage(frames,preview){
       d.cats[cat].push({...item});
     });
     persistState();
-    if(!Object.keys(d.cats).length&&!d.uncertain.length)showToast("Couldn't find items — try better lighting");
+    if(!Object.keys(d.cats).length&&!d.uncertain.length)showToast("Couldn't find items — try a closer, slower scan");
   }catch(err){console.error('Fetch error:',err);showToast('⚠️ Network error — check connection')}
   analyzingOverlay.classList.remove('open');
   syncBodyLock();
@@ -442,6 +476,7 @@ function render(){
     return;
   }
   let html='';
+  html+=`<section class="hero-card"><div class="hero-kicker">Household OS</div><div class="hero-title">${LOC_META[state.loc].label} inventory that feels audited, not guessed.</div><p class="hero-copy">${d.summary?.overview||`Use tighter framing and slower sweep coverage so Freezy can justify what belongs in your ${state.loc}.`}</p><div class="hero-stats"><div class="hero-stat"><strong>${cats.reduce((sum,cat)=>sum+d.cats[cat].length,0)}</strong><span>confirmed</span></div><div class="hero-stat"><strong>${d.uncertain.length}</strong><span>needs review</span></div><div class="hero-stat"><strong>${d.shopping.length}</strong><span>shopping cues</span></div></div></section>`;
   if(d.summary?.overview||d.summary?.confidence_note){
     html+=`<section class="summary-card"><div class="summary-title">Scan readout</div><div class="summary-copy">${escHtml(d.summary?.overview||'Inventory updated from your latest scan.')}</div><div class="summary-note">${escHtml(d.summary?.confidence_note||'Scan completed')} · ${escHtml(scanStamp)}</div></section>`;
   }
