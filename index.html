@@ -44,17 +44,14 @@
     .tab.active{background:linear-gradient(135deg, rgba(109,227,255,0.16) 0%, rgba(29,67,91,0.62) 100%);border-color:rgba(109,227,255,0.34);color:var(--text);box-shadow:0 12px 30px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.04)}
     .content{flex:1;min-height:0;overflow:visible;padding:8px 20px 24px}
     .content::-webkit-scrollbar{display:none}
-    .hero-card,.summary-card,.uncertain-card{padding:22px;border:1px solid rgba(123,161,197,0.14);border-radius:18px;background:linear-gradient(180deg, rgba(13,21,30,0.96), rgba(10,17,24,0.96));box-shadow:var(--shadow);margin-bottom:16px;backdrop-filter:blur(18px)}
-    .hero-kicker{font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
-    .hero-title{font-family:var(--mono);font-size:30px;line-height:0.98;font-weight:700;letter-spacing:-0.04em;margin-bottom:10px;max-width:300px}
-    .hero-copy{font-size:14px;color:var(--text-2);line-height:1.58;max-width:320px}
-    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
-    .hero-stat{padding:14px;border-radius:12px;background:rgba(16,25,36,0.82);border:1px solid rgba(123,161,197,0.14);box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
-    .hero-stat strong{display:block;font-size:16px;font-weight:600;color:var(--text)}
-    .hero-stat span{display:block;font-size:10px;font-family:var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
-    .summary-title,.uncertain-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
-    .summary-copy,.uncertain-copy{font-size:13px;color:var(--text-2);line-height:1.6}
-    .summary-note{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-3)}
+    .workspace-card,.uncertain-card{padding:18px;border:1px solid rgba(123,161,197,0.14);border-radius:18px;background:linear-gradient(180deg, rgba(13,21,30,0.96), rgba(10,17,24,0.96));box-shadow:var(--shadow);margin-bottom:16px;backdrop-filter:blur(18px)}
+    .workspace-title{font-family:var(--mono);font-size:22px;line-height:1.02;font-weight:700;letter-spacing:-0.03em;color:var(--text)}
+    .workspace-copy,.uncertain-copy{font-size:13px;color:var(--text-2);line-height:1.6;margin-top:8px}
+    .workspace-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+    .workspace-stat{padding:12px;border-radius:12px;background:rgba(16,25,36,0.82);border:1px solid rgba(123,161,197,0.14)}
+    .workspace-stat strong{display:block;font-size:16px;font-weight:600;color:var(--text)}
+    .workspace-stat span{display:block;font-size:10px;font-family:var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+    .uncertain-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px}
     .uncertain-list{display:grid;gap:8px;margin-top:12px}
     .uncertain-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(16,25,36,0.82);border:1px solid rgba(123,161,197,0.14)}
     .uncertain-icon{font-size:20px;flex-shrink:0}
@@ -67,12 +64,6 @@
     .scene-shell{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(123,161,197,0.14);background:rgba(8,13,19,0.92);box-shadow:var(--shadow)}
     .scene-image{width:100%;height:min(72vh, 620px);object-fit:cover;display:block}
     .scene-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);background-size:32px 32px;pointer-events:none}
-    .scan-overlay{position:absolute;inset:0;pointer-events:none}
-    .scan-tag{position:absolute;border:1.5px solid rgba(109,227,255,0.95);border-radius:10px;background:rgba(109,227,255,0.06);box-shadow:0 0 0 1px rgba(109,227,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04)}
-    .scan-tag.uncertain{border-color:rgba(255,184,77,0.95);background:rgba(255,184,77,0.06)}
-    .scan-tag-label{position:absolute;top:-14px;left:8px;background:rgba(6,11,17,0.96);color:#fff;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:700;line-height:1;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis;border:1px solid rgba(109,227,255,0.24);display:flex;align-items:center;gap:6px}
-    .scan-tag.uncertain .scan-tag-label{border-color:rgba(255,184,77,0.28)}
-    .scan-tag-arrow{width:8px;height:8px;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);display:inline-block}
     .scan-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(180deg, rgba(7,12,18,0.98), rgba(10,16,23,0.98));border-top:1px solid rgba(123,161,197,0.14)}
     .scan-meta-copy{font-family:var(--mono);font-size:10px;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase}
     .scan-meta-stack{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -522,17 +513,13 @@ function render(){
   const scanStamp=d.lastScanAt?new Date(d.lastScanAt).toLocaleString([], {month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'No scan yet';
   const confirmedCount=cats.reduce((sum,cat)=>sum+d.cats[cat].length,0);
   if(!hasScanData){
-    content.innerHTML=`<section class="hero-card"><div class="hero-kicker">Cold Chain Command</div><div class="hero-title">${LOC_META[state.loc].label} visibility without guesswork.</div><p class="hero-copy">Capture the space, audit what is actually visible, and promote only detections the system can justify from evidence.</p><div class="hero-stats"><div class="hero-stat"><strong>Photo</strong><span>wide plus crops</span></div><div class="hero-stat"><strong>Sweep</strong><span>6-view coverage</span></div><div class="hero-stat"><strong>Trust</strong><span>grounded labels</span></div></div></section><div class="empty-state"><div class="empty-icon">${LOC_META[state.loc].emoji}</div><h2>No scan on record</h2><p>Run a capture pass on your ${state.loc}. Wide framing is useful, but tight evidence wins.</p></div>`;
+    content.innerHTML=`<section class="workspace-card"><div class="workspace-title">${LOC_META[state.loc].label} scan workspace</div><p class="workspace-copy">Capture the space, inspect the evidence, resolve unknowns, and rescan until the inventory is credible. The image is the source of truth, not decorative overlays.</p><div class="workspace-stats"><div class="workspace-stat"><strong>Photo</strong><span>full frame + crops</span></div><div class="workspace-stat"><strong>Sweep</strong><span>6 view pass</span></div><div class="workspace-stat"><strong>Trust</strong><span>no fake boxes</span></div></div></section><div class="empty-state"><div class="empty-icon">${LOC_META[state.loc].emoji}</div><h2>No scan on record</h2><p>Run a capture pass on your ${state.loc}. Tight evidence wins over wide guesses.</p></div>`;
     return;
   }
   let html='';
-  html+=`<section class="hero-card"><div class="hero-kicker">Inventory Operations</div><div class="hero-title">${LOC_META[state.loc].label} state estimate.</div><p class="hero-copy">${d.summary?.overview||`Use tighter framing and slower sweep coverage so Freezy can justify what belongs in your ${state.loc}.`}</p><div class="hero-stats"><div class="hero-stat"><strong>${cats.reduce((sum,cat)=>sum+d.cats[cat].length,0)}</strong><span>confirmed</span></div><div class="hero-stat"><strong>${d.uncertain.length}</strong><span>flagged</span></div><div class="hero-stat"><strong>${d.shopping.length}</strong><span>derived cues</span></div></div></section>`;
-  if(d.summary?.overview||d.summary?.confidence_note){
-    html+=`<section class="summary-card"><div class="summary-title">System Readout</div><div class="summary-copy">${escHtml(d.summary?.overview||'Inventory updated from your latest scan.')}</div><div class="summary-note">${escHtml(d.summary?.confidence_note||'Scan completed')} · ${escHtml(scanStamp)}</div></section>`;
-  }
+  html+=`<section class="workspace-card"><div class="workspace-title">${LOC_META[state.loc].label} review</div><p class="workspace-copy">${escHtml(d.summary?.overview||`Inspect the scene, verify unknowns, and rescan if the evidence is weak.`)}</p><div class="workspace-stats"><div class="workspace-stat"><strong>${confirmedCount}</strong><span>confirmed</span></div><div class="workspace-stat"><strong>${d.uncertain.length}</strong><span>unknowns</span></div><div class="workspace-stat"><strong>${d.shopping.length}</strong><span>shopping cues</span></div></div></section>`;
   if(d.preview){
-    const overlay=renderSceneLabels(d);
-    html+=`<section class="scene-review"><div class="scene-shell"><img src="${d.preview}" class="scene-image" alt="Scan">${overlay}<div class="scene-grid"></div></div><div class="scan-meta"><div><div class="scan-meta-copy">Scan Review · ${escHtml(LOC_META[state.loc].label)} · ${escHtml(scanStamp)}</div></div><div class="scan-meta-stack"><div class="scan-chip">${confirmedCount} confirmed</div><div class="scan-chip uncertain">${d.uncertain.length} unresolved</div><div class="scan-chip">${d.lastCaptureMode==='photo'?'photo evidence':'sweep evidence'}</div></div></div><div class="review-strip"><div class="review-tile"><strong>${confirmedCount}</strong><span>boxed items</span></div><div class="review-tile"><strong>${d.uncertain.length}</strong><span>question marks</span></div><div class="review-tile"><strong>${Math.max(confirmedCount+d.uncertain.length,0)}</strong><span>total traces</span></div></div></section>`;
+    html+=`<section class="scene-review"><div class="scene-shell"><img src="${d.preview}" class="scene-image" alt="Scan"><div class="scene-grid"></div></div><div class="scan-meta"><div><div class="scan-meta-copy">Scan Review · ${escHtml(LOC_META[state.loc].label)} · ${escHtml(scanStamp)}</div></div><div class="scan-meta-stack"><div class="scan-chip">${confirmedCount} confirmed</div><div class="scan-chip uncertain">${d.uncertain.length} unresolved</div><div class="scan-chip">${d.lastCaptureMode==='photo'?'photo evidence':'sweep evidence'}</div></div></div><div class="review-strip"><div class="review-tile"><strong>${confirmedCount}</strong><span>classified</span></div><div class="review-tile"><strong>${d.uncertain.length}</strong><span>needs rescan</span></div><div class="review-tile"><strong>${Math.max(confirmedCount+d.uncertain.length,0)}</strong><span>total findings</span></div></div></section>`;
   }
   html+=`<button class="rescan-btn" data-action="scan-again">📷 Scan again</button>`;
   cats.forEach(cat=>{
@@ -604,27 +591,6 @@ function showToast(msg,ms=2800){clearTimeout(toastTimer);toast.textContent=msg;t
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function enc(value){return encodeURIComponent(value)}
 function dec(value){return decodeURIComponent(value)}
-function renderSceneLabels(d){
-  const labels=[];
-  Object.keys(d.cats).forEach(cat=>{
-    d.cats[cat].forEach(item=>{
-      if(item?.box&&item.frame_index===0)labels.push({...item,_kind:'confirmed'});
-    });
-  });
-  d.uncertain.forEach(item=>{
-    if(item?.box&&item.frame_index===0)labels.push({...item,_kind:'uncertain'});
-  });
-  if(!labels.length)return '';
-  return `<div class="scan-overlay">${labels.map(item=>{
-    const left=(item.box.x/1000)*100;
-    const top=(item.box.y/1000)*100;
-    const width=(item.box.w/1000)*100;
-    const height=(item.box.h/1000)*100;
-    const uncertain=item._kind==='uncertain';
-    const label=uncertain?`? ${item.name||'Unknown item'}`:item.name;
-    return `<div class="scan-tag ${uncertain?'uncertain':''}" style="left:${left}%;top:${top}%;width:${width}%;height:${height}%"><div class="scan-tag-label"><span class="scan-tag-arrow"></span>${escHtml(label)}</div></div>`;
-  }).join('')}</div>`;
-}
 content.addEventListener('click',e=>{
   const el=e.target.closest('[data-action]');
   if(!el)return;
