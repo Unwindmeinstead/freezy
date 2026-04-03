@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Freezy</title>
+  <meta name="theme-color" content="#08080f">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#08080f;--surface:#0f0f1a;--surface-2:#161624;--surface-3:#1e1e2e;
+      --border:rgba(255,255,255,0.07);--border-2:rgba(255,255,255,0.12);
+      --accent:#00e0a0;--accent-dim:rgba(0,224,160,0.1);--accent-glow:rgba(0,224,160,0.25);
+      --warn:#ffb347;--danger:#ff5f5f;--text:#ebebf5;--text-2:#8888aa;--text-3:#555570;
+      --mono:'DM Mono',monospace;--sans:'Outfit',sans-serif;--r:14px;--r-sm:10px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+    html{height:100%;background:
+      radial-gradient(circle at top, rgba(0,224,160,0.12), transparent 32%),
+      linear-gradient(180deg, #0b0b12 0%, #08080f 28%, #050509 100%)}
+    body{min-height:100%;width:100%;overflow-x:hidden;overflow-y:auto;background:transparent;color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+    body.modal-open{overflow:hidden;touch-action:none}
+    body::before{content:'';position:fixed;inset:0;background:
+      radial-gradient(ellipse 80% 40% at 50% -10%,rgba(0,224,160,0.08) 0%,transparent 60%),
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,0.04), transparent 24%);
+      pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);background-size:28px 28px;mask-image:linear-gradient(180deg, rgba(0,0,0,0.28), transparent 72%);pointer-events:none;z-index:0}
+    #app{display:flex;flex-direction:column;min-height:100dvh;max-width:430px;margin:0 auto;position:relative;z-index:1;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
+    header{height:68px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(8,8,15,0.78);backdrop-filter:blur(18px);z-index:5}
+    .logo{font-family:var(--mono);font-size:14px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase}
+    .logo-fridge{color:var(--accent)}.logo-ai{color:var(--text-3)}
+    .header-right{display:flex;gap:8px;align-items:center}
+    .loc-pill{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid rgba(0,224,160,0.2);padding:4px 10px;border-radius:20px}
+    .icon-btn{width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);transition:all 0.15s;flex-shrink:0}
+    .icon-btn:active{transform:scale(0.9);color:var(--accent)}
+    .tab-bar{display:flex;padding:14px 20px 12px;gap:8px;flex-shrink:0;position:sticky;top:68px;background:linear-gradient(180deg, rgba(8,8,15,0.96), rgba(8,8,15,0.84));backdrop-filter:blur(16px);z-index:4}
+    .tab{flex:1;height:40px;border-radius:20px;border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--text-3);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px}
+    .tab.active{background:linear-gradient(180deg, rgba(0,224,160,0.16), rgba(0,224,160,0.08));border-color:rgba(0,224,160,0.35);color:var(--accent);box-shadow:inset 0 1px 0 rgba(255,255,255,0.05)}
+    .content{flex:1;min-height:0;overflow:visible;padding:8px 20px 24px}
+    .content::-webkit-scrollbar{display:none}
+    .hero-card{padding:20px;border:1px solid var(--border);border-radius:22px;background:linear-gradient(180deg, rgba(19,19,31,0.94), rgba(11,11,19,0.94));box-shadow:0 20px 60px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);margin-bottom:16px}
+    .hero-kicker{font-family:var(--mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+    .hero-title{font-size:27px;line-height:1.05;font-weight:600;letter-spacing:-0.03em;margin-bottom:10px;max-width:260px}
+    .hero-copy{font-size:13px;color:var(--text-2);line-height:1.6;max-width:300px}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:18px}
+    .hero-stat{padding:12px;border-radius:16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04)}
+    .hero-stat strong{display:block;font-size:16px;font-weight:600;color:var(--text)}
+    .hero-stat span{display:block;font-size:10px;font-family:var(--mono);color:var(--text-3);text-transform:uppercase;letter-spacing:0.08em;margin-top:4px}
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:48dvh;gap:14px;text-align:center;padding:26px 0 8px}
+    .empty-icon{width:100px;height:100px;border-radius:28px;background:linear-gradient(180deg, rgba(26,26,39,0.94), rgba(15,15,26,0.94));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:44px;margin-bottom:4px;box-shadow:0 18px 40px rgba(0,0,0,0.3)}
+    .empty-state h2{font-size:18px;font-weight:600;color:var(--text)}
+    .empty-state p{font-size:13px;color:var(--text-2);max-width:250px;line-height:1.55}
+    .scan-preview-wrap{margin-top:14px}
+    .scan-preview{width:100%;border-radius:var(--r);max-height:150px;object-fit:cover;border:1px solid var(--border);display:block}
+    .scan-meta{font-family:var(--mono);font-size:9px;color:var(--text-3);letter-spacing:0.1em;padding:5px 2px 10px;text-transform:uppercase}
+    .rescan-btn{width:100%;height:36px;border-radius:18px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);font-family:var(--sans);font-size:12px;cursor:pointer;margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.15s}
+    .rescan-btn:active{border-color:var(--accent);color:var(--accent)}
+    .category{margin-top:18px}
+    .cat-header{font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-3);padding:6px 0 8px;display:flex;align-items:center;gap:7px}
+    .cat-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+    .item-card{background:linear-gradient(180deg, rgba(19,19,29,0.96), rgba(14,14,24,0.96));border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px;display:flex;align-items:center;gap:11px;margin-bottom:7px;animation:slideIn 0.2s ease both;box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+    @keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .item-emoji{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+    .item-info{flex:1;min-width:0}
+    .item-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .item-qty{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-top:1px}
+    .expiry-badge{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:20px;font-weight:500;flex-shrink:0;letter-spacing:0.05em}
+    .ex-soon{background:rgba(255,179,71,0.12);color:var(--warn);border:1px solid rgba(255,179,71,0.25)}
+    .ex-urgent{background:rgba(255,95,95,0.12);color:var(--danger);border:1px solid rgba(255,95,95,0.25)}
+    .del-btn{width:26px;height:26px;border-radius:50%;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-3);transition:all 0.15s;flex-shrink:0}
+    .del-btn:active{background:rgba(255,95,95,0.15);color:var(--danger);border-color:rgba(255,95,95,0.4)}
+    .add-row{border:1px dashed var(--border-2);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:7px;cursor:pointer;color:var(--text-3);font-size:12px;transition:all 0.15s}
+    .add-row:active{border-color:var(--accent);color:var(--accent)}
+    .add-input-row{display:flex;gap:8px;margin-bottom:7px}
+    .add-input{flex:1;background:var(--surface);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 14px;color:var(--text);font-family:var(--sans);font-size:14px;outline:none}
+    .add-input::placeholder{color:var(--text-3)}
+    .add-ok{width:42px;flex-shrink:0;background:var(--accent);border:none;border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:#08080f}
+    .shop-section{margin-top:28px;padding-top:22px;border-top:1px solid var(--border)}
+    .section-label{font-family:var(--mono);font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--text-2);margin-bottom:10px}
+    .shop-item{display:flex;align-items:center;gap:11px;padding:11px 14px;background:linear-gradient(180deg, rgba(19,19,29,0.96), rgba(14,14,24,0.96));border:1px solid var(--border);border-radius:var(--r-sm);margin-bottom:7px;transition:opacity 0.2s}
+    .shop-check{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--border-2);cursor:pointer;transition:all 0.15s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .shop-check.checked{background:var(--accent);border-color:var(--accent)}
+    .shop-name{font-size:13px;color:var(--text);flex:1}
+    .shop-del{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:14px;padding:2px;transition:color 0.15s}
+    .shop-del:active{color:var(--danger)}
+    .fab-wrap{position:sticky;bottom:0;left:0;right:0;padding:16px 20px 10px;background:linear-gradient(to top, rgba(8,8,15,0.98) 58%, rgba(8,8,15,0.58) 80%, transparent);pointer-events:none;margin-top:auto;z-index:3}
+    .fab{width:100%;height:56px;border-radius:28px;background:linear-gradient(180deg, #22f2b4 0%, #00e0a0 100%);color:#08080f;font-family:var(--sans);font-size:15px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;pointer-events:all;transition:all 0.2s;box-shadow:0 16px 40px rgba(0,224,160,0.22), inset 0 1px 0 rgba(255,255,255,0.32);letter-spacing:0.02em}
+    .fab:active{transform:scale(0.97);box-shadow:0 0 14px var(--accent-glow)}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;z-index:100;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.25s, visibility 0.25s}
+    .overlay.open{opacity:1;pointer-events:all;visibility:visible}
+    .sheet{width:100%;max-width:430px;background:var(--surface-2);border-radius:24px 24px 0 0;padding:20px 20px 44px;transform:translateY(30px);transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1);border-top:1px solid var(--border)}
+    .overlay.open .sheet{transform:translateY(0)}
+    .handle{width:34px;height:4px;border-radius:2px;background:var(--surface-3);margin:0 auto 18px}
+    .sheet-title{font-size:16px;font-weight:600;text-align:center;margin-bottom:20px;color:var(--text)}
+    .capture-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .cap-opt{background:var(--surface-3);border:1px solid var(--border);border-radius:var(--r);padding:22px 16px;text-align:center;cursor:pointer;transition:all 0.2s}
+    .cap-opt:active{border-color:var(--accent);background:var(--accent-dim)}
+    .cap-opt-icon{font-size:34px;margin-bottom:6px}
+    .cap-opt-label{font-size:14px;font-weight:500;color:var(--text)}
+    .cap-opt-sub{font-size:11px;color:var(--text-3);margin-top:3px}
+    .camera-modal{position:fixed;inset:0;background:#000;z-index:200;display:flex;flex-direction:column;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.2s, visibility 0.2s}
+    .camera-modal.open{opacity:1;pointer-events:all;visibility:visible}
+    .cam-view{flex:1;position:relative;overflow:hidden}
+    #videoEl{width:100%;height:100%;object-fit:cover;display:block}
+    .cam-top{position:absolute;top:0;left:0;right:0;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+    .cam-close{width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;cursor:pointer;color:white}
+    .rec-badge{display:none;align-items:center;gap:5px;font-family:var(--mono);font-size:11px;color:#fff;background:rgba(255,95,95,0.8);padding:4px 10px;border-radius:20px}
+    .rec-badge.on{display:flex}
+    .rec-dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1s infinite}
+    @keyframes blink{50%{opacity:0}}
+    .cam-bottom{position:absolute;bottom:0;left:0;right:0;padding:20px 24px 48px}
+    .cam-hint{text-align:center;font-size:12px;color:rgba(255,255,255,0.55);font-family:var(--mono);margin-bottom:20px;letter-spacing:0.05em}
+    .cam-controls{display:flex;align-items:center;justify-content:center;gap:48px}
+    .shutter{width:68px;height:68px;border-radius:50%;background:white;border:4px solid rgba(255,255,255,0.35);cursor:pointer;transition:all 0.12s;outline:none}
+    .shutter.rec{background:var(--danger);border-color:rgba(255,95,95,0.4)}
+    .shutter:active{transform:scale(0.9)}
+    .analyzing{position:fixed;inset:0;background:rgba(8,8,15,0.96);z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;pointer-events:none;visibility:hidden;transition:opacity 0.3s, visibility 0.3s}
+    .analyzing.open{opacity:1;pointer-events:all;visibility:visible}
+    .spin-wrap{width:110px;height:110px;position:relative;display:flex;align-items:center;justify-content:center}
+    .spin-ring{position:absolute;inset:0;border-radius:50%;border:2px solid var(--surface-3)}
+    .spin-ring::after{content:'';position:absolute;inset:-2px;border-radius:50%;border:2px solid transparent;border-top-color:var(--accent);animation:spin 0.9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spin-emoji{font-size:44px}
+    .analyzing-label{font-family:var(--mono);font-size:12px;color:var(--text-2);letter-spacing:0.12em}
+    .analyzing-sub{font-size:11px;color:var(--text-3);font-family:var(--mono);letter-spacing:0.08em}
+    .toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface-2);border:1px solid var(--border-2);border-radius:20px;padding:9px 18px;font-size:13px;color:var(--text);z-index:500;opacity:0;transition:all 0.25s;white-space:nowrap;pointer-events:none;max-width:min(90vw, 360px);overflow:hidden;text-overflow:ellipsis}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    #captureCanvas{display:none}
+    @media (max-width:430px){
+      #app{max-width:none}
+      .hero-title{font-size:24px}
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo"><span class="logo-fridge">freezy</span><span class="logo-ai">.ai</span></div>
+    <div class="header-right">
+      <div class="loc-pill" id="locPill">Fridge</div>
+      <button class="icon-btn" id="shareBtn" title="Share list">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+  <div class="tab-bar">
+    <button class="tab active" data-loc="fridge">🧊 Fridge</button>
+    <button class="tab" data-loc="freezer">❄️ Freezer</button>
+    <button class="tab" data-loc="pantry">🥫 Pantry</button>
+  </div>
+  <div class="content" id="content"></div>
+  <div class="fab-wrap">
+    <button class="fab" id="scanBtn">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      Scan Now
+    </button>
+  </div>
+</div>
+
+<div class="overlay" id="captureOverlay">
+  <div class="sheet">
+    <div class="handle"></div>
+    <div class="sheet-title">How do you want to scan?</div>
+    <div class="capture-grid">
+      <div class="cap-opt" id="photoOpt">
+        <div class="cap-opt-icon">📷</div>
+        <div class="cap-opt-label">Photo</div>
+        <div class="cap-opt-sub">Quick snap</div>
+      </div>
+      <div class="cap-opt" id="videoOpt">
+        <div class="cap-opt-icon">🎥</div>
+        <div class="cap-opt-label">Multi-scan</div>
+        <div class="cap-opt-sub">Capture a few angles</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="camera-modal" id="cameraModal">
+  <div class="cam-view">
+    <video id="videoEl" autoplay playsinline muted></video>
+    <canvas id="captureCanvas"></canvas>
+    <div class="cam-top">
+      <button class="cam-close" id="camClose">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <div class="rec-badge" id="recBadge"><div class="rec-dot"></div> REC</div>
+      <div style="width:40px"></div>
+    </div>
+    <div class="cam-bottom">
+      <div class="cam-hint" id="camHint"></div>
+      <div class="cam-controls">
+        <div style="width:40px"></div>
+        <button class="shutter" id="shutterBtn"></button>
+        <div style="width:40px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="analyzing" id="analyzingOverlay">
+  <div class="spin-wrap">
+    <div class="spin-ring"></div>
+    <div class="spin-emoji" id="spinEmoji">🧊</div>
+  </div>
+  <div class="analyzing-label">Analyzing contents...</div>
+  <div class="analyzing-sub">Powered by AI vision</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY='freezy-state-v3';
+const REQUEST_TIMEOUT_MS=30000;
+const MAX_MULTI_SCAN_FRAMES=5;
+const MULTI_SCAN_INTERVAL_MS=900;
+const VALID_LOCS=['fridge','freezer','pantry'];
+const LOC_META={fridge:{label:'Fridge',emoji:'🧊'},freezer:{label:'Freezer',emoji:'❄️'},pantry:{label:'Pantry',emoji:'🥫'}};
+
+const $=id=>document.getElementById(id);
+const content=$('content');
+const captureOverlay=$('captureOverlay');
+const cameraModal=$('cameraModal');
+const analyzingOverlay=$('analyzingOverlay');
+const videoEl=$('videoEl');
+const canvas=$('captureCanvas');
+const toast=$('toast');
+const recBadge=$('recBadge');
+const shutterBtn=$('shutterBtn');
+const camHint=$('camHint');
+const locPill=$('locPill');
+const spinEmoji=$('spinEmoji');
+const scanBtn=$('scanBtn');
+const shareBtn=$('shareBtn');
+
+function defaultLocationData(){
+  return {cats:{},shopping:[],preview:null};
+}
+
+function defaultData(){
+  return {fridge:defaultLocationData(),freezer:defaultLocationData(),pantry:defaultLocationData()};
+}
+
+function normalizeItem(item){
+  if(!item||typeof item!=='object')return null;
+  const name=cleanText(item.name,80);
+  if(!name)return null;
+  const category=cleanText(item.category,40)||'Other';
+  return {
+    name,
+    category,
+    emoji:cleanText(item.emoji,8)||'🍽️',
+    quantity:cleanText(item.quantity,40),
+    expiry_concern:['none','soon','urgent'].includes(item.expiry_concern)?item.expiry_concern:'none'
+  };
+}
+
+function normalizeShopItem(item){
+  if(!item||typeof item!=='object')return null;
+  const name=cleanText(item.name,60);
+  if(!name)return null;
+  return {name,emoji:cleanText(item.emoji,8)||'🛒'};
+}
+
+function normalizeLocationData(raw){
+  const safe=defaultLocationData();
+  if(!raw||typeof raw!=='object')return safe;
+  const cats=raw.cats&&typeof raw.cats==='object'&&!Array.isArray(raw.cats)?raw.cats:{};
+  Object.keys(cats).forEach(cat=>{
+    const list=Array.isArray(cats[cat])?cats[cat].map(normalizeItem).filter(Boolean):[];
+    if(list.length)safe.cats[cleanText(cat,40)||'Other']=list;
+  });
+  safe.shopping=Array.isArray(raw.shopping)?raw.shopping.map(normalizeShopItem).filter(Boolean):[];
+  safe.preview=typeof raw.preview==='string'?raw.preview:null;
+  return safe;
+}
+
+function normalizeAppState(raw){
+  const base=defaultData();
+  const incoming=raw&&typeof raw==='object'?raw:{};
+  VALID_LOCS.forEach(loc=>{
+    base[loc]=normalizeLocationData(incoming.data?.[loc]);
+  });
+  return {
+    loc:VALID_LOCS.includes(incoming.loc)?incoming.loc:'fridge',
+    data:base
+  };
+}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    return raw?normalizeAppState(JSON.parse(raw)):normalizeAppState(null);
+  }catch{
+    return normalizeAppState(null);
+  }
+}
+
+const storedState=loadState();
+const state={
+  loc:storedState.loc,
+  data:storedState.data,
+  captureMode:'photo',
+  stream:null,
+  isRecording:false,
+  isAnalyzing:false,
+  captureFrames:[],
+  captureIntervalId:null
+};
+
+function curData(){return state.data[state.loc]}
+
+function persistState(){
+  const payload={loc:state.loc,data:state.data};
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
+    return true;
+  }catch(err){
+    try{
+      const compact=normalizeAppState(payload);
+      VALID_LOCS.forEach(loc=>{compact.data[loc].preview=null;state.data[loc].preview=null});
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(compact));
+      showToast('Saved inventory without photo previews');
+      return true;
+    }catch{
+      console.error('Storage error:',err);
+      showToast('⚠️ Could not save inventory on this device');
+      return false;
+    }
+  }
+}
+
+function updateLocUI(){
+  document.querySelectorAll('.tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.loc===state.loc));
+  locPill.textContent=LOC_META[state.loc].label;
+  spinEmoji.textContent=LOC_META[state.loc].emoji;
+  scanBtn.disabled=state.isAnalyzing;
+}
+
+function syncBodyLock(){
+  document.body.classList.toggle('modal-open',
+    captureOverlay.classList.contains('open')||
+    cameraModal.classList.contains('open')||
+    analyzingOverlay.classList.contains('open')
+  );
+}
+
+function closeCaptureModal(){
+  captureOverlay.classList.remove('open');
+  syncBodyLock();
+}
+
+function openCaptureModal(){
+  if(state.isAnalyzing)return;
+  captureOverlay.classList.add('open');
+  syncBodyLock();
+}
+
+function clearCaptureInterval(){
+  if(state.captureIntervalId){
+    clearInterval(state.captureIntervalId);
+    state.captureIntervalId=null;
+  }
+}
+
+function resetCameraState(){
+  clearCaptureInterval();
+  recBadge.classList.remove('on');
+  shutterBtn.classList.remove('rec');
+  state.isRecording=false;
+  state.captureFrames=[];
+}
+
+function stopCamera(){
+  clearCaptureInterval();
+  if(state.stream){
+    state.stream.getTracks().forEach(track=>track.stop());
+    state.stream=null;
+  }
+  videoEl.srcObject=null;
+  cameraModal.classList.remove('open');
+  resetCameraState();
+  syncBodyLock();
+}
+
+function setAnalyzing(isAnalyzing){
+  state.isAnalyzing=isAnalyzing;
+  analyzingOverlay.classList.toggle('open',isAnalyzing);
+  scanBtn.disabled=isAnalyzing;
+  syncBodyLock();
+}
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    if(state.isAnalyzing)return;
+    state.loc=tab.dataset.loc;
+    persistState();
+    updateLocUI();
+    render();
+  });
+});
+
+scanBtn.addEventListener('click',openCaptureModal);
+shareBtn.addEventListener('click',shareList);
+captureOverlay.addEventListener('click',e=>{if(e.target===captureOverlay)closeCaptureModal()});
+$('photoOpt').addEventListener('click',()=>{closeCaptureModal();state.captureMode='photo';startCamera()});
+$('videoOpt').addEventListener('click',()=>{closeCaptureModal();state.captureMode='multi';startCamera()});
+$('camClose').addEventListener('click',stopCamera);
+
+async function startCamera(){
+  if(state.isAnalyzing)return;
+  if(!navigator.mediaDevices?.getUserMedia){
+    showToast('⚠️ Camera is not supported on this device');
+    return;
+  }
+  resetCameraState();
+  try{
+    state.stream=await navigator.mediaDevices.getUserMedia({
+      video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
+      audio:false
+    });
+    videoEl.srcObject=state.stream;
+    camHint.textContent=state.captureMode==='photo'
+      ?`Point at your ${state.loc} and tap`
+      :`Tap once to start capturing a few angles`;
+    cameraModal.classList.add('open');
+    syncBodyLock();
+  }catch(err){
+    console.error(err);
+    showToast('⚠️ Camera access denied');
+  }
+}
+
+function captureCurrentFrame({quality=0.72,previewQuality=0.32}={}){
+  const w=videoEl.videoWidth||1280;
+  const h=videoEl.videoHeight||720;
+  canvas.width=w;
+  canvas.height=h;
+  const ctx=canvas.getContext('2d');
+  if(!ctx)return null;
+  ctx.drawImage(videoEl,0,0);
+  return {
+    base64:canvas.toDataURL('image/jpeg',quality).split(',')[1],
+    preview:canvas.toDataURL('image/jpeg',previewQuality)
+  };
+}
+
+function captureSingleScan(){
+  const frame=captureCurrentFrame();
+  if(!frame){
+    showToast('⚠️ Could not capture image');
+    return;
+  }
+  stopCamera();
+  analyzeScan({images:[frame.base64],preview:frame.preview});
+}
+
+function collectMultiFrame(){
+  if(state.captureFrames.length>=MAX_MULTI_SCAN_FRAMES){
+    finishMultiScan();
+    return;
+  }
+  const frame=captureCurrentFrame();
+  if(frame){
+    state.captureFrames.push(frame);
+    camHint.textContent=`Capturing angles ${state.captureFrames.length}/${MAX_MULTI_SCAN_FRAMES}... tap to finish`;
+  }
+}
+
+function startMultiScan(){
+  state.captureFrames=[];
+  state.isRecording=true;
+  shutterBtn.classList.add('rec');
+  recBadge.classList.add('on');
+  collectMultiFrame();
+  state.captureIntervalId=setInterval(collectMultiFrame,MULTI_SCAN_INTERVAL_MS);
+  camHint.textContent=`Capturing angles ${state.captureFrames.length}/${MAX_MULTI_SCAN_FRAMES}... tap to finish`;
+}
+
+function finishMultiScan(){
+  clearCaptureInterval();
+  const frames=state.captureFrames.slice(0,MAX_MULTI_SCAN_FRAMES);
+  if(!frames.length){
+    const fallback=captureCurrentFrame();
+    if(fallback)frames.push(fallback);
+  }
+  const preview=frames[frames.length-1]?.preview||null;
+  const images=frames.map(frame=>frame.base64).filter(Boolean);
+  stopCamera();
+  if(!images.length){
+    showToast('⚠️ Could not capture scan');
+    return;
+  }
+  analyzeScan({images,preview});
+}
+
+shutterBtn.addEventListener('click',()=>{
+  if(state.captureMode==='photo'){
+    captureSingleScan();
+    return;
+  }
+  if(!state.isRecording){
+    startMultiScan();
+    return;
+  }
+  finishMultiScan();
+});
+
+async function analyzeScan({images,preview}){
+  if(!Array.isArray(images)||!images.length)return;
+  setAnalyzing(true);
+  const loc=state.loc;
+  const controller=new AbortController();
+  const timeoutId=setTimeout(()=>controller.abort(),REQUEST_TIMEOUT_MS);
+  try{
+    const res=await fetch('/api/analyze',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({images,location:loc}),
+      signal:controller.signal
+    });
+
+    let parsedBody=null;
+    try{
+      parsedBody=await res.json();
+    }catch{
+      parsedBody=null;
+    }
+
+    if(!res.ok){
+      const errMsg=parsedBody?.detail||parsedBody?.error||`Error ${res.status}`;
+      showToast('⚠️ '+errMsg);
+      return;
+    }
+
+    const d=state.data[loc];
+    d.preview=preview;
+    d.cats={};
+    d.shopping=Array.isArray(parsedBody?.shopping)?parsedBody.shopping.map(normalizeShopItem).filter(Boolean):[];
+    const items=Array.isArray(parsedBody?.items)?parsedBody.items.map(normalizeItem).filter(Boolean):[];
+    items.forEach(item=>{
+      const cat=item.category||'Other';
+      if(!d.cats[cat])d.cats[cat]=[];
+      d.cats[cat].push(item);
+    });
+    persistState();
+    if(!items.length){
+      showToast("Couldn't find items. Try better lighting or another angle.");
+    }
+    render();
+  }catch(err){
+    console.error('Analyze error:',err);
+    showToast(err?.name==='AbortError'?'⚠️ Scan timed out':'⚠️ Network error');
+  }finally{
+    clearTimeout(timeoutId);
+    setAnalyzing(false);
+  }
+}
+
+function render(){
+  const d=curData();
+  const cats=Object.keys(d.cats).sort();
+  if(!cats.length&&!d.shopping.length){
+    content.innerHTML=`<section class="hero-card"><div class="hero-kicker">Cold storage intelligence</div><div class="hero-title">See what is in your ${LOC_META[state.loc].label.toLowerCase()} before it goes bad.</div><p class="hero-copy">Scan once, get a clean inventory, track urgency, and keep a smart shopping list without touching a spreadsheet.</p><div class="hero-stats"><div class="hero-stat"><strong>1 tap</strong><span>capture flow</span></div><div class="hero-stat"><strong>Multi</strong><span>angle scan</span></div><div class="hero-stat"><strong>Saved</strong><span>on device</span></div></div></section><div class="empty-state"><div class="empty-icon">${LOC_META[state.loc].emoji}</div><h2>Nothing scanned yet</h2><p>Tap Scan Now to capture your ${state.loc} and build an inventory.</p></div>`;
+    return;
+  }
+
+  let html='';
+  if(d.preview){
+    html+=`<div class="scan-preview-wrap"><img src="${d.preview}" class="scan-preview" alt="Last scan"><div class="scan-meta">⟳ Last scan · ${LOC_META[state.loc].label}</div></div>`;
+  }
+  html+=`<button class="rescan-btn" data-action="scan-again">📷 Scan again</button>`;
+
+  cats.forEach(cat=>{
+    const catKey=cat.replace(/[^a-z0-9]/gi,'_');
+    html+=`<div class="category"><div class="cat-header"><div class="cat-dot"></div>${escHtml(cat)}</div>`;
+    d.cats[cat].forEach((item,idx)=>{
+      let badge='';
+      if(item.expiry_concern==='soon')badge=`<span class="expiry-badge ex-soon">USE SOON</span>`;
+      if(item.expiry_concern==='urgent')badge=`<span class="expiry-badge ex-urgent">USE NOW</span>`;
+      html+=`<div class="item-card"><span class="item-emoji">${escHtml(item.emoji||'🍽️')}</span><div class="item-info"><div class="item-name">${escHtml(item.name)}</div>${item.quantity?`<div class="item-qty">${escHtml(item.quantity)}</div>`:''}</div>${badge}<button class="del-btn" data-action="delete-item" data-cat="${enc(cat)}" data-idx="${idx}" aria-label="Delete ${escHtml(item.name)}"><svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+    });
+    html+=`<div class="add-row" id="addrow_${catKey}" data-action="show-add" data-cat="${enc(cat)}" data-cat-key="${catKey}"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add to ${escHtml(cat)}</div></div>`;
+  });
+
+  if(d.shopping.length){
+    html+=`<div class="shop-section"><div class="section-label">🛒 Shopping List</div>`;
+    d.shopping.forEach((item,i)=>{
+      html+=`<div class="shop-item" id="shoprow_${i}"><div class="shop-check" id="shopchk_${i}" data-action="toggle-shop" data-idx="${i}"></div><span style="font-size:18px">${escHtml(item.emoji||'🛒')}</span><span class="shop-name">${escHtml(item.name)}</span><button class="shop-del" data-action="delete-shop" data-idx="${i}" aria-label="Delete ${escHtml(item.name)}">×</button></div>`;
+    });
+    html+=`</div>`;
+  }
+
+  content.innerHTML=html;
+}
+
+function deleteItem(cat,idx){
+  const d=curData();
+  if(!d.cats[cat])return;
+  d.cats[cat].splice(idx,1);
+  if(!d.cats[cat].length)delete d.cats[cat];
+  persistState();
+  render();
+}
+
+function showAddInput(cat,catKey){
+  const row=document.getElementById('addrow_'+catKey);
+  if(!row)return;
+  const inputId='addinp_'+catKey;
+  row.outerHTML=`<div class="add-input-row"><input class="add-input" id="${inputId}" placeholder="Item name..." autocomplete="off" maxlength="80"><button class="add-ok" data-action="confirm-add" data-cat="${enc(cat)}" data-cat-key="${catKey}"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></button></div>`;
+  const inp=document.getElementById(inputId);
+  if(inp){
+    inp.focus();
+    inp.addEventListener('keydown',e=>{if(e.key==='Enter')confirmAdd(cat,catKey)});
+  }
+}
+
+function confirmAdd(cat,catKey){
+  const inp=document.getElementById('addinp_'+catKey);
+  const val=cleanText(inp?.value,80);
+  if(val){
+    const d=curData();
+    if(!d.cats[cat])d.cats[cat]=[];
+    d.cats[cat].push({name:val,category:cat,emoji:'🍽️',quantity:'',expiry_concern:'none'});
+    persistState();
+  }
+  render();
+}
+
+function toggleShop(i){
+  const chk=document.getElementById('shopchk_'+i);
+  const row=document.getElementById('shoprow_'+i);
+  if(!chk)return;
+  const on=chk.classList.toggle('checked');
+  chk.innerHTML=on?`<svg width="9" height="9" fill="none" stroke="#08080f" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`:'';
+  if(row)row.style.opacity=on?'0.35':'1';
+}
+
+function deleteShop(i){
+  curData().shopping.splice(i,1);
+  persistState();
+  render();
+}
+
+async function shareList(){
+  const d=curData();
+  const cats=Object.keys(d.cats);
+  if(!cats.length&&!d.shopping.length){
+    showToast('Nothing to share yet');
+    return;
+  }
+  const label=LOC_META[state.loc].label;
+  let text=`${LOC_META[state.loc].emoji} ${label} Contents\n${'─'.repeat(24)}\n\n`;
+  cats.forEach(cat=>{
+    text+=`${cat}\n`;
+    d.cats[cat].forEach(item=>{
+      const qty=item.quantity?` · ${item.quantity}`:'';
+      const flag=item.expiry_concern==='urgent'?' ⚠️':item.expiry_concern==='soon'?' 🕐':'';
+      text+=`  ${item.emoji} ${item.name}${qty}${flag}\n`;
+    });
+    text+='\n';
+  });
+  if(d.shopping.length){
+    text+=`🛒 Shopping List\n`;
+    d.shopping.forEach(item=>{text+=`  ${item.emoji} ${item.name}\n`});
+  }
+  try{
+    if(navigator.share){
+      await navigator.share({title:'Freezy',text});
+    }else{
+      await navigator.clipboard.writeText(text);
+      showToast('📋 Copied!');
+    }
+  }catch{
+    showToast('⚠️ Could not share list');
+  }
+}
+
+let toastTimer;
+function showToast(msg,ms=2800){
+  clearTimeout(toastTimer);
+  toast.textContent=msg;
+  toast.classList.add('show');
+  toastTimer=setTimeout(()=>toast.classList.remove('show'),ms);
+}
+
+function cleanText(value,maxLength){
+  return String(value||'').replace(/\s+/g,' ').trim().slice(0,maxLength);
+}
+
+function escHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function enc(value){return encodeURIComponent(value)}
+function dec(value){return decodeURIComponent(value)}
+
+content.addEventListener('click',e=>{
+  const el=e.target.closest('[data-action]');
+  if(!el)return;
+  const action=el.dataset.action;
+  if(action==='scan-again')openCaptureModal();
+  if(action==='delete-item')deleteItem(dec(el.dataset.cat),Number(el.dataset.idx));
+  if(action==='show-add')showAddInput(dec(el.dataset.cat),el.dataset.catKey);
+  if(action==='confirm-add')confirmAdd(dec(el.dataset.cat),el.dataset.catKey);
+  if(action==='toggle-shop')toggleShop(Number(el.dataset.idx));
+  if(action==='delete-shop')deleteShop(Number(el.dataset.idx));
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(cameraModal.classList.contains('open'))stopCamera();
+    else if(captureOverlay.classList.contains('open'))closeCaptureModal();
+  }
+});
+
+updateLocUI();
+render();
+</script>
+</body>
+</html>
