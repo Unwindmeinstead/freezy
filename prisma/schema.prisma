@@ -1,0 +1,271 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum LocationType {
+  FRIDGE
+  FREEZER
+  PANTRY
+  CUSTOM
+}
+
+enum InventoryStatus {
+  ACTIVE
+  CONSUMED
+  ARCHIVED
+}
+
+enum FreshnessState {
+  FRESH
+  USE_SOON
+  EXPIRED
+  UNKNOWN
+}
+
+enum InventorySource {
+  SCAN_CONFIRMED
+  MANUAL
+  BARCODE
+  RECEIPT
+  IMPORT
+}
+
+enum ScanStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum EventType {
+  ITEM_DETECTED
+  ITEM_CONFIRMED
+  ITEM_CORRECTED
+  ITEM_ADDED_MANUAL
+  ITEM_CONSUMED
+  ITEM_MOVED
+  ITEM_ARCHIVED
+  SCAN_CREATED
+  SCAN_CONFIRMED
+}
+
+enum ShoppingItemSource {
+  MANUAL
+  AUTO_LOW_STOCK
+  AUTO_RECIPE
+  AUTO_STAPLE
+}
+
+enum ShoppingItemStatus {
+  OPEN
+  CHECKED
+  DELETED
+}
+
+enum NotificationType {
+  USE_SOON
+  LOW_STOCK
+  SCAN_COMPLETE
+}
+
+model User {
+  id             String          @id @default(cuid())
+  email          String          @unique
+  name           String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  memberships    Membership[]
+  scans          Scan[]
+  inventoryEvents InventoryEvent[] @relation("ActorEvents")
+}
+
+model Household {
+  id               String            @id @default(cuid())
+  name             String
+  timezone         String            @default("America/New_York")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  memberships      Membership[]
+  locations        Location[]
+  inventoryItems   InventoryItem[]
+  inventoryEvents  InventoryEvent[]
+  scans            Scan[]
+  shoppingLists    ShoppingList[]
+  notifications    Notification[]
+}
+
+model Membership {
+  id           String         @id @default(cuid())
+  userId       String
+  householdId  String
+  role         MembershipRole @default(MEMBER)
+  createdAt    DateTime       @default(now())
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household    Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, householdId])
+}
+
+model Location {
+  id             String          @id @default(cuid())
+  householdId     String
+  type           LocationType
+  name           String
+  sortOrder      Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  household      Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  inventoryItems InventoryItem[]
+  scans          Scan[]
+
+  @@index([householdId, sortOrder])
+}
+
+model InventoryItem {
+  id                  String            @id @default(cuid())
+  householdId         String
+  locationId          String
+  canonicalName       String
+  displayName         String
+  category            String
+  quantityText        String?
+  quantityValue       Float?
+  quantityUnit        String?
+  status              InventoryStatus   @default(ACTIVE)
+  freshnessState      FreshnessState    @default(UNKNOWN)
+  confidence          Float?
+  source              InventorySource
+  purchasedAt         DateTime?
+  expiresAt           DateTime?
+  estimatedExpiresAt  DateTime?
+  lastSeenAt          DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  household           Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  location            Location          @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  events              InventoryEvent[]
+  shoppingListItems   ShoppingListItem[]
+
+  @@index([householdId, status])
+  @@index([householdId, locationId, category])
+  @@index([householdId, canonicalName])
+}
+
+model InventoryEvent {
+  id               String         @id @default(cuid())
+  householdId      String
+  inventoryItemId  String?
+  actorUserId      String?
+  type             EventType
+  payload          Json
+  createdAt        DateTime       @default(now())
+  household        Household      @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  inventoryItem    InventoryItem? @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+  actorUser        User?          @relation("ActorEvents", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([householdId, createdAt])
+  @@index([inventoryItemId, createdAt])
+}
+
+model Scan {
+  id               String          @id @default(cuid())
+  householdId       String
+  userId           String
+  locationId       String
+  status           ScanStatus      @default(QUEUED)
+  errorCode        String?
+  createdAt        DateTime        @default(now())
+  completedAt      DateTime?
+  household        Household       @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  location         Location        @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  evidences        ScanEvidence[]
+  proposals        ScanProposal[]
+
+  @@index([householdId, createdAt])
+  @@index([status, createdAt])
+}
+
+model ScanEvidence {
+  id              String    @id @default(cuid())
+  scanId          String
+  imageUrl        String
+  thumbnailUrl    String?
+  qualityScore    Float?
+  modelOutput     Json?
+  createdAt       DateTime  @default(now())
+  scan            Scan      @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId, createdAt])
+}
+
+model ScanProposal {
+  id                 String    @id @default(cuid())
+  scanId             String
+  canonicalName      String
+  displayName        String
+  category           String
+  quantityText       String?
+  freshnessState     FreshnessState @default(UNKNOWN)
+  confidence         Float
+  proposedAction     String
+  mergedIntoItemId   String?
+  createdAt          DateTime  @default(now())
+  scan               Scan      @relation(fields: [scanId], references: [id], onDelete: Cascade)
+
+  @@index([scanId, confidence])
+}
+
+model ShoppingList {
+  id           String             @id @default(cuid())
+  householdId  String
+  name         String             @default("Primary")
+  active       Boolean            @default(true)
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  household    Household          @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  items        ShoppingListItem[]
+
+  @@index([householdId, active])
+}
+
+model ShoppingListItem {
+  id                String              @id @default(cuid())
+  shoppingListId     String
+  inventoryItemId   String?
+  name              String
+  quantityText      String?
+  status            ShoppingItemStatus  @default(OPEN)
+  source            ShoppingItemSource
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  shoppingList      ShoppingList        @relation(fields: [shoppingListId], references: [id], onDelete: Cascade)
+  inventoryItem     InventoryItem?      @relation(fields: [inventoryItemId], references: [id], onDelete: SetNull)
+
+  @@index([shoppingListId, status])
+}
+
+model Notification {
+  id             String            @id @default(cuid())
+  householdId     String
+  type           NotificationType
+  title          String
+  body           String
+  readAt         DateTime?
+  payload        Json?
+  createdAt      DateTime          @default(now())
+  household      Household         @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId, createdAt])
+}
