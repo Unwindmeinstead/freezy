@@ -289,6 +289,233 @@
       font-size:12px;
       line-height:1.55;
     }
+    .home-brief{
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at top right, rgba(179,134,67,.14), transparent 28%),
+        linear-gradient(145deg, rgba(255,253,249,.9), rgba(243,235,223,.96));
+    }
+    .home-brief::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.38), transparent 22%),
+        radial-gradient(circle at bottom left, rgba(85,102,80,.10), transparent 26%);
+    }
+    .home-brief > *{
+      position:relative;
+      z-index:1;
+    }
+    .brief-grid{
+      display:grid;
+      grid-template-columns:1.3fr .9fr;
+      gap:12px;
+    }
+    .brief-lead{
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+    .brief-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      align-self:flex-start;
+      padding:8px 11px;
+      border-radius:var(--radius-pill);
+      background:rgba(255,255,255,.68);
+      border:1px solid rgba(52,42,32,.08);
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:.1em;
+      text-transform:uppercase;
+      color:var(--ink-soft);
+    }
+    .brief-headline{
+      margin:0;
+      font-family:var(--font-display);
+      font-size:40px;
+      line-height:.88;
+      letter-spacing:-.04em;
+      max-width:10ch;
+    }
+    .brief-copy{
+      margin:0;
+      color:var(--ink-soft);
+      font-size:13px;
+      line-height:1.65;
+      max-width:34ch;
+    }
+    .brief-metrics{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:8px;
+    }
+    .brief-metric{
+      padding:12px;
+      border-radius:18px;
+      background:rgba(255,255,255,.62);
+      border:1px solid rgba(52,42,32,.08);
+      box-shadow:var(--shadow-soft);
+    }
+    .brief-metric strong{
+      display:block;
+      font-size:22px;
+      line-height:1;
+      margin-bottom:4px;
+    }
+    .brief-metric span{
+      display:block;
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--ink-muted);
+    }
+    .brief-side{
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+    .priority-card,
+    .focus-card{
+      border-radius:22px;
+      padding:14px;
+      border:1px solid rgba(52,42,32,.08);
+      box-shadow:var(--shadow-soft);
+    }
+    .priority-card{
+      background:linear-gradient(180deg, rgba(34,26,20,.92), rgba(54,42,32,.92));
+      color:#fff8f0;
+    }
+    .priority-card .section-label{
+      color:rgba(255,248,240,.58);
+      margin-bottom:6px;
+    }
+    .priority-card strong{
+      display:block;
+      font-size:15px;
+      line-height:1.35;
+      margin-bottom:5px;
+    }
+    .priority-card p{
+      margin:0;
+      color:rgba(255,248,240,.78);
+      font-size:12px;
+      line-height:1.55;
+    }
+    .focus-card{
+      background:linear-gradient(180deg, rgba(255,255,255,.74), rgba(248,242,232,.96));
+    }
+    .focus-list{
+      display:grid;
+      gap:8px;
+    }
+    .focus-item{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:10px 0;
+      border-top:1px solid rgba(52,42,32,.08);
+    }
+    .focus-item:first-child{
+      border-top:none;
+      padding-top:0;
+    }
+    .focus-mark{
+      width:28px;
+      height:28px;
+      border-radius:10px;
+      background:var(--surface-2);
+      display:grid;
+      place-items:center;
+      flex-shrink:0;
+      font-size:14px;
+    }
+    .focus-item strong{
+      display:block;
+      font-size:13px;
+      line-height:1.35;
+      margin-bottom:3px;
+    }
+    .focus-item span{
+      display:block;
+      color:var(--ink-soft);
+      font-size:11px;
+      line-height:1.45;
+    }
+    .home-two-up{
+      display:grid;
+      grid-template-columns:1.12fr .88fr;
+      gap:12px;
+    }
+    .signal-stack,
+    .recipe-stack{
+      display:grid;
+      gap:10px;
+    }
+    .signal-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.62);
+    }
+    .signal-index{
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      background:rgba(85,102,80,.10);
+      color:var(--accent);
+      display:grid;
+      place-items:center;
+      font-family:var(--font-mono);
+      font-size:10px;
+      flex-shrink:0;
+      margin-top:1px;
+    }
+    .recipe-feature{
+      min-height:148px;
+      align-content:end;
+      background:
+        linear-gradient(180deg, rgba(34,26,20,.06), rgba(34,26,20,.56)),
+        url("https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80") center/cover;
+      color:#fff8f0;
+    }
+    .recipe-feature .section-label{
+      color:rgba(255,248,240,.58);
+      margin-bottom:6px;
+    }
+    .recipe-feature strong{
+      font-size:18px;
+      line-height:1.2;
+    }
+    .recipe-feature p{
+      color:rgba(255,248,240,.82);
+    }
+    .recipe-mini{
+      display:grid;
+      gap:4px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.62);
+    }
+    .recipe-mini strong{
+      font-size:13px;
+      line-height:1.35;
+    }
+    .recipe-mini p{
+      margin:0;
+      color:var(--ink-soft);
+      font-size:11px;
+      line-height:1.45;
+    }
     .meta-row{
       display:flex;
       flex-wrap:wrap;
@@ -833,6 +1060,9 @@
       #app{padding:0}
       .shell{border-radius:0;min-height:100dvh}
       .header-stats{grid-template-columns:1fr 1fr 1fr}
+      .brief-grid,
+      .home-two-up{grid-template-columns:1fr}
+      .brief-metrics{grid-template-columns:1fr 1fr 1fr}
       .grid-2{grid-template-columns:1fr}
       .bottom-nav{
         width:calc(100vw - 18px);
@@ -1150,6 +1380,8 @@
       const stats=summarizeInventory(d);
       const recipes=recipeSuggestions(d);
       const activity=activitySummary(d);
+      const items=Object.values(d.cats).flat();
+      const priorityItems=items.filter(item=>item.expiry_concern!=='none').slice(0,3);
       const lead=stats.urgent
         ? `${stats.urgent} item${stats.urgent===1?'':'s'} should move first.`
         : stats.soon
@@ -1158,24 +1390,54 @@
             ? `${LOC_META[state.loc].label} inventory looks steady right now.`
             : `No ${state.loc} record yet.`;
       return `
-        <section class="panel">
+        <section class="panel home-brief">
           <div class="panel-head">
             <div>
               <div class="section-label">Overview</div>
-              <h2 class="panel-title">${LOC_META[state.loc].label} dashboard</h2>
-              <p class="panel-copy">${lead}</p>
+              <h2 class="panel-title">${LOC_META[state.loc].label} briefing</h2>
+              <p class="panel-copy">A premium home screen should feel like a household command center, not a stack of generic cards.</p>
             </div>
             <div class="mini-stat"><strong>${stats.total}</strong><span>items</span></div>
           </div>
-          <div class="grid-2">
-            <div class="card">
-              <strong>Next best action</strong>
-              <p>${stats.total?'Refresh after a grocery run or when major items move.':'Start with a shelf scan to establish the inventory baseline.'}</p>
-              <div class="meta-row"><div class="chip">source • scan</div><div class="chip">freshness • estimated</div></div>
+          <div class="brief-grid">
+            <div class="brief-lead">
+              <div class="brief-kicker">${LOC_META[state.loc].emoji} ${LOC_META[state.loc].label}</div>
+              <h3 class="brief-headline">${lead}</h3>
+              <p class="brief-copy">${stats.total?'Freezy is tracking what is visible, surfacing what should move next, and turning the shelf into a useful household signal.':'Start with one strong scan and the home screen becomes a living operational brief for this location.'}</p>
+              <div class="brief-metrics">
+                <div class="brief-metric"><strong>${stats.total}</strong><span>tracked</span></div>
+                <div class="brief-metric"><strong>${stats.soon + stats.urgent}</strong><span>use soon</span></div>
+                <div class="brief-metric"><strong>${stats.shopping}</strong><span>restock</span></div>
+              </div>
             </div>
-            <div class="card">
-              <strong>Kitchen context</strong>
-              <p>${LOC_META[state.loc].context}</p>
+            <div class="brief-side">
+              <div class="priority-card">
+                <div class="section-label">Priority</div>
+                <strong>${stats.total?'Next best move':'First action'}</strong>
+                <p>${stats.total?'Refresh after a grocery run or when major items move. If trust drops, scan again before planning meals or shopping.':'Run a shelf scan to establish the baseline before relying on planning or shopping cues.'}</p>
+              </div>
+              <div class="focus-card">
+                <div class="section-label">Focus now</div>
+                <div class="focus-list">
+                  ${priorityItems.length ? priorityItems.map(item=>`
+                    <div class="focus-item">
+                      <div class="focus-mark">${escHtml(item.emoji||'🍽️')}</div>
+                      <div>
+                        <strong>${escHtml(item.name)}</strong>
+                        <span>${item.expiry_concern==='urgent'?'Use first today or tomorrow':'Worth using this week'}${item.quantity?` • ${escHtml(item.quantity)}`:''}</span>
+                      </div>
+                    </div>
+                  `).join('') : `
+                    <div class="focus-item">
+                      <div class="focus-mark">${LOC_META[state.loc].emoji}</div>
+                      <div>
+                        <strong>${LOC_META[state.loc].label} context</strong>
+                        <span>${LOC_META[state.loc].context}</span>
+                      </div>
+                    </div>
+                  `}
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -1191,41 +1453,47 @@
             </div>
           </div>
         </section>
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="section-label">Signals</div>
-              <h2 class="panel-title">What needs attention</h2>
-            </div>
-          </div>
-          <div class="compact-list">
-            ${activity.map(entry=>`
-              <div class="row">
-                <div class="row-main">
-                  <div class="row-title">${escHtml(entry.title)}</div>
-                  <div class="row-meta">${escHtml(entry.meta)}</div>
-                </div>
+        <section class="home-two-up">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="section-label">Signals</div>
+                <h2 class="panel-title">What needs attention</h2>
               </div>
-            `).join('')}
-          </div>
-        </section>
-        <section class="panel">
-          <div class="panel-head">
-            <div>
-              <div class="section-label">Cook</div>
-              <h2 class="panel-title">Tonight ideas</h2>
             </div>
-          </div>
-          <div class="compact-list">
-            ${recipes.map(recipe=>`
-              <div class="row">
-                <div class="row-main">
-                  <div class="row-title">${escHtml(recipe.name)}</div>
-                  <div class="row-meta">${escHtml(recipe.meta)}</div>
+            <div class="signal-stack">
+              ${activity.map((entry,index)=>`
+                <div class="signal-row">
+                  <div class="signal-index">0${index+1}</div>
+                  <div class="row-main">
+                    <div class="row-title">${escHtml(entry.title)}</div>
+                    <div class="row-meta">${escHtml(entry.meta)}</div>
+                  </div>
                 </div>
+              `).join('')}
+            </div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="section-label">Cook</div>
+                <h2 class="panel-title">Tonight ideas</h2>
               </div>
-            `).join('')}
-          </div>
+            </div>
+            <div class="recipe-stack">
+              <div class="card recipe-feature">
+                <div class="section-label">Featured suggestion</div>
+                <strong>${escHtml(recipes[0].name)}</strong>
+                <p>${escHtml(recipes[0].meta)}</p>
+              </div>
+              ${recipes.slice(1).map(recipe=>`
+                <div class="recipe-mini">
+                  <strong>${escHtml(recipe.name)}</strong>
+                  <p>${escHtml(recipe.meta)}</p>
+                </div>
+              `).join('')}
+            </div>
+          </section>
         </section>
       `;
     }
