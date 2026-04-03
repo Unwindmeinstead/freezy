@@ -4,35 +4,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Freezy</title>
-  <meta name="theme-color" content="#f4efe6">
+  <meta name="theme-color" content="#f5f0e7">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root{
-      --canvas:#f4efe6;
-      --canvas-2:#ebe4d8;
-      --surface:#fffdf8;
-      --surface-2:#f8f2e9;
-      --surface-3:#efe7da;
-      --line:rgba(58,47,35,.10);
-      --line-strong:rgba(58,47,35,.16);
-      --ink:#221b15;
-      --ink-soft:#5b5148;
-      --ink-muted:#8a7f74;
-      --accent:#52624f;
-      --accent-soft:rgba(82,98,79,.10);
-      --accent-strong:#3f4d3c;
-      --fresh:#7d9077;
-      --soon:#b88939;
-      --urgent:#a05d45;
-      --shadow-soft:0 12px 30px rgba(44,31,17,.07);
-      --shadow-strong:0 24px 54px rgba(44,31,17,.12);
+      --canvas:#f5f0e7;
+      --canvas-2:#ebe3d6;
+      --surface:#fffdf9;
+      --surface-2:#f8f2e8;
+      --surface-3:#efe7db;
+      --line:rgba(52,42,32,.10);
+      --line-strong:rgba(52,42,32,.16);
+      --ink:#221a14;
+      --ink-soft:#5f554b;
+      --ink-muted:#8d8175;
+      --accent:#556650;
+      --accent-2:#b38643;
+      --accent-soft:rgba(85,102,80,.10);
+      --fresh:#809277;
+      --soon:#b78539;
+      --urgent:#a35d43;
+      --danger:#a35d43;
       --radius-xl:30px;
       --radius-lg:24px;
-      --radius-md:20px;
-      --radius-sm:16px;
+      --radius-md:18px;
       --radius-pill:999px;
+      --shadow-soft:0 12px 28px rgba(42,30,18,.07);
+      --shadow-strong:0 26px 60px rgba(42,30,18,.12);
       --font-display:'Cormorant Garamond',serif;
       --font-sans:'Inter',sans-serif;
       --font-mono:'IBM Plex Mono',monospace;
@@ -41,16 +41,16 @@
     html{
       min-height:100%;
       background:
-        radial-gradient(circle at top right, rgba(128,148,112,.18), transparent 24%),
-        radial-gradient(circle at 14% 12%, rgba(184,137,57,.08), transparent 20%),
+        radial-gradient(circle at top right, rgba(128,146,119,.16), transparent 24%),
+        radial-gradient(circle at 10% 16%, rgba(183,133,57,.08), transparent 18%),
         linear-gradient(180deg,var(--canvas) 0%, var(--canvas-2) 100%);
     }
     body{
       margin:0;
       min-height:100%;
+      background:transparent;
       color:var(--ink);
       font-family:var(--font-sans);
-      background:transparent;
       -webkit-font-smoothing:antialiased;
     }
     body.modal-open{overflow:hidden}
@@ -60,16 +60,16 @@
       max-width:440px;
       margin:0 auto;
       min-height:100dvh;
-      padding:14px 14px calc(24px + env(safe-area-inset-bottom));
+      padding:14px 14px calc(18px + env(safe-area-inset-bottom));
     }
     .shell{
       min-height:calc(100dvh - 28px);
-      background:linear-gradient(180deg, rgba(255,253,248,.88), rgba(248,242,233,.96));
-      border:1px solid rgba(255,255,255,.55);
+      background:linear-gradient(180deg, rgba(255,253,249,.88), rgba(248,242,232,.96));
+      border:1px solid rgba(255,255,255,.56);
       border-radius:34px;
       overflow:hidden;
-      box-shadow:var(--shadow-strong);
       position:relative;
+      box-shadow:var(--shadow-strong);
       backdrop-filter:blur(24px);
     }
     .shell::before{
@@ -78,63 +78,57 @@
       inset:0;
       pointer-events:none;
       background:
-        linear-gradient(180deg, rgba(255,255,255,.44), transparent 20%),
-        radial-gradient(circle at top, rgba(82,98,79,.08), transparent 32%);
+        linear-gradient(180deg, rgba(255,255,255,.44), transparent 16%),
+        radial-gradient(circle at top, rgba(85,102,80,.08), transparent 32%);
     }
-    .topbar{
+    .app-header{
       position:sticky;
       top:0;
-      z-index:10;
-      padding:18px 18px 12px;
-      background:linear-gradient(180deg, rgba(255,253,248,.94), rgba(255,253,248,.76));
-      backdrop-filter:blur(16px);
-      border-bottom:1px solid rgba(58,47,35,.06);
+      z-index:12;
+      padding:18px 18px 14px;
+      background:linear-gradient(180deg, rgba(255,253,249,.95), rgba(255,253,249,.76));
+      backdrop-filter:blur(18px);
+      border-bottom:1px solid rgba(52,42,32,.06);
       display:grid;
       gap:12px;
     }
-    .toprow{
+    .header-row{
       display:flex;
-      align-items:start;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
     }
-    .brand{
-      display:grid;
-      gap:3px;
-    }
-    .brand-kicker{
+    .header-copy{display:grid;gap:4px}
+    .eyebrow{
       font-family:var(--font-mono);
       font-size:10px;
       letter-spacing:.12em;
       text-transform:uppercase;
       color:var(--ink-muted);
     }
-    .brand-row{
-      display:flex;
-      align-items:baseline;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .wordmark{
+    .header-title{
+      margin:0;
       font-family:var(--font-display);
-      font-size:31px;
-      line-height:.9;
+      font-size:32px;
+      line-height:.92;
       letter-spacing:-.03em;
     }
-    .context{
+    .header-subtitle{
+      margin:0;
       color:var(--ink-soft);
       font-size:12px;
+      line-height:1.5;
     }
-    .top-actions{display:flex;align-items:center;gap:8px}
+    .header-actions{display:flex;gap:8px;align-items:center}
     .pill{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:9px 12px;
       border-radius:var(--radius-pill);
       border:1px solid var(--line);
-      background:rgba(255,255,255,.66);
+      background:rgba(255,255,255,.68);
       color:var(--ink-soft);
+      padding:9px 12px;
       font-size:12px;
       font-weight:600;
       box-shadow:var(--shadow-soft);
@@ -144,65 +138,55 @@
       height:40px;
       border:none;
       border-radius:50%;
-      background:rgba(255,255,255,.68);
+      background:rgba(255,255,255,.72);
+      color:var(--ink-soft);
       display:grid;
       place-items:center;
-      color:var(--ink-soft);
       box-shadow:var(--shadow-soft);
     }
-    .summary-bar{
+    .header-stats{
       display:grid;
-      grid-template-columns:1.3fr .9fr .9fr .9fr;
+      grid-template-columns:1.25fr .8fr .8fr;
       gap:8px;
     }
-    .summary-card{
-      min-height:72px;
+    .stat{
+      padding:12px;
       border-radius:20px;
       border:1px solid var(--line);
       background:rgba(255,255,255,.62);
       box-shadow:var(--shadow-soft);
-      padding:12px;
       display:grid;
       gap:4px;
-      align-content:start;
     }
-    .summary-card strong{
+    .stat strong{
       font-size:21px;
       line-height:1;
     }
-    .summary-card span{
+    .stat span{
       font-family:var(--font-mono);
       font-size:10px;
       letter-spacing:.08em;
       text-transform:uppercase;
       color:var(--ink-muted);
     }
-    .summary-card p{
+    .stat p{
       margin:0;
+      color:var(--ink-soft);
       font-size:12px;
       line-height:1.45;
-      color:var(--ink-soft);
     }
-    .segment-wrap{
-      position:sticky;
-      top:140px;
-      z-index:9;
-      padding:12px 18px 0;
-      background:linear-gradient(180deg, rgba(250,246,239,.92), rgba(250,246,239,.64));
-      backdrop-filter:blur(16px);
-    }
-    .segments{
+    .location-tabs{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:8px;
       padding:6px;
       border-radius:20px;
-      background:rgba(255,255,255,.68);
       border:1px solid var(--line);
+      background:rgba(255,255,255,.64);
       box-shadow:var(--shadow-soft);
     }
-    .segment{
-      min-height:44px;
+    .location-tab{
+      min-height:42px;
       border:none;
       border-radius:15px;
       background:transparent;
@@ -214,28 +198,29 @@
       justify-content:center;
       gap:6px;
     }
-    .segment.active{
-      color:var(--accent-strong);
-      background:linear-gradient(180deg, rgba(82,98,79,.16), rgba(82,98,79,.08));
+    .location-tab.active{
+      background:linear-gradient(180deg, rgba(85,102,80,.16), rgba(85,102,80,.08));
+      color:var(--accent);
       box-shadow:inset 0 1px 0 rgba(255,255,255,.72);
     }
-    .content{
-      padding:14px 18px 122px;
+    .page-shell{
+      padding:14px 18px 102px;
       display:grid;
       gap:14px;
+      min-height:calc(100dvh - 240px);
     }
     .panel{
-      border-radius:26px;
-      border:1px solid rgba(58,47,35,.08);
-      background:rgba(255,253,248,.74);
-      box-shadow:var(--shadow-soft);
-      padding:16px;
       display:grid;
       gap:12px;
+      border-radius:26px;
+      border:1px solid rgba(52,42,32,.08);
+      background:rgba(255,253,249,.74);
+      box-shadow:var(--shadow-soft);
+      padding:16px;
     }
-    .panel-header{
+    .panel-head{
       display:flex;
-      align-items:start;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
     }
@@ -256,24 +241,23 @@
     }
     .panel-copy{
       margin:4px 0 0;
+      color:var(--ink-soft);
       font-size:12px;
       line-height:1.55;
-      color:var(--ink-soft);
     }
-    .tiny-stat{
+    .mini-stat{
       padding:10px 12px;
       border-radius:18px;
-      background:var(--surface-2);
       border:1px solid var(--line);
-      min-width:80px;
+      background:var(--surface-2);
     }
-    .tiny-stat strong{
+    .mini-stat strong{
       display:block;
       font-size:20px;
       line-height:1;
       margin-bottom:4px;
     }
-    .tiny-stat span{
+    .mini-stat span{
       display:block;
       font-family:var(--font-mono);
       font-size:10px;
@@ -281,25 +265,25 @@
       text-transform:uppercase;
       color:var(--ink-muted);
     }
-    .operational-grid{
+    .grid-2{
       display:grid;
-      grid-template-columns:1.2fr .8fr;
+      grid-template-columns:1fr 1fr;
       gap:12px;
     }
-    .brief-card,.scan-card,.recipe-card,.shop-card,.signal-card{
-      border-radius:22px;
-      border:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(248,242,233,.94));
-      padding:14px;
-      box-shadow:var(--shadow-soft);
+    .card{
       display:grid;
       gap:8px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(248,242,232,.96));
+      box-shadow:var(--shadow-soft);
+      padding:14px;
     }
-    .brief-card strong,.scan-card strong,.recipe-card strong,.shop-card strong,.signal-card strong{
+    .card strong{
       font-size:14px;
       line-height:1.35;
     }
-    .brief-card p,.scan-card p,.recipe-card p,.shop-card p,.signal-card p{
+    .card p{
       margin:0;
       color:var(--ink-soft);
       font-size:12px;
@@ -318,80 +302,99 @@
       border-radius:var(--radius-pill);
       border:1px solid var(--line);
       background:rgba(255,255,255,.58);
+      color:var(--ink-soft);
       font-family:var(--font-mono);
       font-size:10px;
       letter-spacing:.08em;
       text-transform:uppercase;
-      color:var(--ink-soft);
     }
-    .evidence{
-      overflow:hidden;
-      padding:0;
+    .compact-list{display:grid;gap:8px}
+    .row{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:12px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.62);
     }
-    .evidence-shell{
-      display:grid;
-      grid-template-columns:112px 1fr;
-      min-height:112px;
-    }
-    .evidence-media{
-      background:var(--surface-3);
-      position:relative;
-      overflow:hidden;
-    }
-    .evidence-media img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-    .evidence-fallback{
-      width:100%;
-      height:100%;
-      min-height:112px;
+    .row-mark{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      background:var(--surface-2);
       display:grid;
       place-items:center;
-      font-size:32px;
-      color:var(--accent-strong);
-      background:
-        radial-gradient(circle at top, rgba(82,98,79,.14), transparent 32%),
-        linear-gradient(180deg, var(--surface-2), var(--surface-3));
+      font-size:18px;
+      flex-shrink:0;
     }
-    .evidence-main{
-      padding:14px;
+    .row-main{
+      flex:1;
+      min-width:0;
       display:grid;
-      gap:8px;
-      align-content:center;
+      gap:5px;
     }
-    .evidence-title{
-      font-size:15px;
+    .row-title{
+      font-size:13px;
       font-weight:700;
       line-height:1.35;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
-    .evidence-copy{
+    .row-meta{
       color:var(--ink-soft);
-      font-size:12px;
-      line-height:1.5;
+      font-size:11px;
+      line-height:1.45;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 10px;
     }
-    .inventory-stack{
+    .status-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+    }
+    .status-chip{
+      padding:5px 9px;
+      border-radius:var(--radius-pill);
+      font-family:var(--font-mono);
+      font-size:10px;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      border:1px solid transparent;
+    }
+    .fresh{background:rgba(128,146,119,.12);color:var(--fresh);border-color:rgba(128,146,119,.22)}
+    .soon{background:rgba(183,133,57,.12);color:var(--soon);border-color:rgba(183,133,57,.22)}
+    .urgent{background:rgba(163,93,67,.12);color:var(--urgent);border-color:rgba(163,93,67,.22)}
+    .neutral{background:rgba(85,102,80,.08);color:var(--ink-soft);border-color:rgba(52,42,32,.10)}
+    .ghost-btn{
+      width:28px;
+      height:28px;
+      border:none;
+      border-radius:50%;
+      background:transparent;
+      color:var(--ink-muted);
       display:grid;
-      gap:10px;
+      place-items:center;
+      flex-shrink:0;
     }
-    .category{
+    .inventory-group{
       display:grid;
       gap:9px;
       border-radius:22px;
       border:1px solid var(--line);
       background:rgba(255,255,255,.62);
-      padding:14px;
       box-shadow:var(--shadow-soft);
+      padding:14px;
     }
-    .category-head{
+    .inventory-group-head{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
+      gap:8px;
     }
-    .category-title{
+    .inventory-group-title{
       display:flex;
       align-items:center;
       gap:8px;
@@ -414,83 +417,12 @@
       letter-spacing:.08em;
       text-transform:uppercase;
     }
-    .item-row{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
-      padding:12px;
-      border-radius:18px;
-      border:1px solid rgba(58,47,35,.08);
-      background:linear-gradient(180deg, rgba(255,253,248,.84), rgba(248,243,235,.96));
-    }
-    .item-mark{
-      width:38px;
-      height:38px;
-      border-radius:14px;
-      background:var(--surface-2);
-      display:grid;
-      place-items:center;
-      font-size:18px;
-      flex-shrink:0;
-    }
-    .item-main{
-      flex:1;
-      min-width:0;
-      display:grid;
-      gap:6px;
-    }
-    .item-name{
-      font-size:14px;
-      font-weight:700;
-      line-height:1.3;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .item-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px 10px;
-      color:var(--ink-soft);
-      font-size:11px;
-      line-height:1.45;
-    }
-    .status-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:7px;
-    }
-    .status-chip{
-      padding:5px 9px;
-      border-radius:var(--radius-pill);
-      font-family:var(--font-mono);
-      font-size:10px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      border:1px solid transparent;
-    }
-    .fresh{background:rgba(125,144,119,.12);color:var(--fresh);border-color:rgba(125,144,119,.22)}
-    .soon{background:rgba(184,137,57,.12);color:var(--soon);border-color:rgba(184,137,57,.24)}
-    .urgent{background:rgba(160,93,69,.12);color:var(--urgent);border-color:rgba(160,93,69,.22)}
-    .neutral{background:rgba(82,98,79,.08);color:var(--ink-soft);border-color:rgba(58,47,35,.10)}
-    .ghost-btn{
-      width:28px;
-      height:28px;
-      border:none;
-      border-radius:50%;
-      background:transparent;
-      color:var(--ink-muted);
-      display:grid;
-      place-items:center;
-      flex-shrink:0;
-      margin-top:2px;
-    }
     .add-row{
       width:100%;
       border:none;
       border-radius:16px;
-      background:rgba(82,98,79,.08);
-      color:var(--accent-strong);
+      background:rgba(85,102,80,.08);
+      color:var(--accent);
       padding:11px 13px;
       display:flex;
       align-items:center;
@@ -510,9 +442,9 @@
       outline:none;
       border-radius:16px;
       background:var(--surface-2);
-      padding:12px 13px;
       box-shadow:inset 0 0 0 1px var(--line);
       color:var(--ink);
+      padding:12px 13px;
     }
     .add-ok{
       width:44px;
@@ -521,80 +453,118 @@
       background:var(--accent);
       color:#fff;
     }
-    .compact-list{
+    .evidence{
+      overflow:hidden;
+      padding:0;
+    }
+    .evidence-shell{
       display:grid;
-      gap:8px;
+      grid-template-columns:112px 1fr;
+      min-height:112px;
     }
-    .compact-row{
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-      padding:12px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.6);
+    .evidence-media{
+      overflow:hidden;
+      background:var(--surface-3);
     }
-    .check{
-      width:20px;
-      height:20px;
-      border-radius:50%;
-      border:1.5px solid var(--line-strong);
-      background:rgba(255,255,255,.78);
+    .evidence-media img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .evidence-fallback{
+      width:100%;
+      height:100%;
+      min-height:112px;
       display:grid;
       place-items:center;
-      flex-shrink:0;
-      margin-top:2px;
+      font-size:32px;
+      color:var(--accent);
+      background:
+        radial-gradient(circle at top, rgba(85,102,80,.14), transparent 30%),
+        linear-gradient(180deg, var(--surface-2), var(--surface-3));
     }
-    .check.checked{
-      background:var(--accent);
-      border-color:var(--accent);
-    }
-    .compact-main{
-      flex:1;
-      min-width:0;
+    .evidence-main{
+      padding:14px;
       display:grid;
-      gap:4px;
+      gap:8px;
+      align-content:center;
     }
-    .compact-title{
-      font-size:13px;
+    .evidence-title{
+      font-size:15px;
       font-weight:700;
       line-height:1.35;
     }
-    .compact-meta{
+    .evidence-copy{
+      color:var(--ink-soft);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .settings-list{display:grid;gap:8px}
+    .settings-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.62);
+    }
+    .settings-row strong{
+      display:block;
+      font-size:13px;
+      line-height:1.35;
+    }
+    .settings-row span{
+      display:block;
       color:var(--ink-soft);
       font-size:11px;
       line-height:1.45;
+      margin-top:3px;
     }
-    .floating-cta{
+    .bottom-nav{
       position:fixed;
       left:50%;
-      bottom:20px;
+      bottom:14px;
       transform:translateX(-50%);
-      width:min(394px,calc(100vw - 28px));
-      pointer-events:none;
-      z-index:30;
+      width:min(404px,calc(100vw - 24px));
+      z-index:20;
+      border-radius:28px;
+      padding:10px;
+      background:rgba(34,26,20,.92);
+      box-shadow:0 22px 40px rgba(34,26,20,.28);
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px;
+      backdrop-filter:blur(16px);
     }
-    .fab{
-      pointer-events:auto;
-      width:100%;
-      min-height:60px;
+    .nav-btn{
       border:none;
-      border-radius:999px;
-      background:linear-gradient(180deg, #5d6e59, #4b5c47);
-      color:#fff9f1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      font-size:15px;
-      font-weight:700;
-      box-shadow:0 18px 38px rgba(63,77,60,.24);
+      background:transparent;
+      color:rgba(255,248,240,.62);
+      min-height:58px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      gap:4px;
+      padding:8px 4px;
+      font-size:11px;
+      font-weight:600;
     }
-    .fab:disabled{opacity:.65}
+    .nav-btn svg{display:block}
+    .nav-btn.active{
+      color:#fff8f0;
+      background:rgba(255,248,240,.10);
+    }
+    .nav-btn.scan{
+      background:linear-gradient(180deg, rgba(179,134,67,.28), rgba(85,102,80,.22));
+      color:#fff8f0;
+    }
     .overlay{
       position:fixed;
       inset:0;
-      background:rgba(34,27,21,.38);
+      background:rgba(34,26,20,.38);
       backdrop-filter:blur(12px);
       display:flex;
       align-items:flex-end;
@@ -613,7 +583,7 @@
     .sheet{
       width:min(440px,100%);
       border-radius:28px 28px 0 0;
-      background:linear-gradient(180deg, rgba(255,253,248,.98), rgba(244,238,228,.98));
+      background:linear-gradient(180deg, rgba(255,253,249,.98), rgba(244,238,228,.98));
       border:1px solid rgba(255,255,255,.7);
       box-shadow:var(--shadow-strong);
       padding:18px 18px 34px;
@@ -627,7 +597,7 @@
       width:42px;
       height:5px;
       border-radius:999px;
-      background:rgba(58,47,35,.12);
+      background:rgba(52,42,32,.12);
       margin:0 auto;
     }
     .sheet-title{
@@ -661,8 +631,8 @@
     .camera-modal{
       position:fixed;
       inset:0;
-      z-index:110;
       background:#11100e;
+      z-index:110;
       display:flex;
       flex-direction:column;
       opacity:0;
@@ -744,9 +714,9 @@
     }
     @keyframes pulse{50%{opacity:.35}}
     .cam-guidance{
+      max-width:28ch;
       text-align:center;
       color:#fff8f0;
-      max-width:28ch;
       display:grid;
       gap:5px;
     }
@@ -772,12 +742,12 @@
     .analyzing{
       position:fixed;
       inset:0;
-      z-index:120;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:rgba(244,239,230,.96);
+      background:rgba(245,240,231,.96);
       backdrop-filter:blur(18px);
+      z-index:120;
       opacity:0;
       visibility:hidden;
       pointer-events:none;
@@ -791,8 +761,8 @@
     .analyze-card{
       width:min(336px,calc(100vw - 36px));
       border-radius:28px;
-      background:linear-gradient(180deg, rgba(255,253,248,.96), rgba(247,241,231,.96));
-      border:1px solid rgba(58,47,35,.08);
+      background:linear-gradient(180deg, rgba(255,253,249,.96), rgba(247,241,231,.96));
+      border:1px solid rgba(52,42,32,.08);
       box-shadow:var(--shadow-strong);
       padding:26px 22px;
       display:grid;
@@ -804,7 +774,7 @@
       width:84px;
       height:84px;
       border-radius:50%;
-      border:2px solid rgba(58,47,35,.10);
+      border:2px solid rgba(52,42,32,.10);
       position:relative;
     }
     .spinner::after{
@@ -840,10 +810,10 @@
     .toast{
       position:fixed;
       left:50%;
-      bottom:94px;
+      bottom:96px;
       transform:translateX(-50%) translateY(10px);
       max-width:min(360px,calc(100vw - 32px));
-      background:rgba(34,27,21,.9);
+      background:rgba(34,26,20,.9);
       color:#fff8f0;
       border-radius:999px;
       padding:12px 16px;
@@ -862,28 +832,28 @@
     @media (max-width:420px){
       #app{padding:0}
       .shell{border-radius:0;min-height:100dvh}
-      .summary-bar{grid-template-columns:1fr 1fr}
-      .segment-wrap{top:182px}
-      .operational-grid{grid-template-columns:1fr}
-      .floating-cta{width:calc(100vw - 24px);bottom:14px}
+      .header-stats{grid-template-columns:1fr 1fr 1fr}
+      .grid-2{grid-template-columns:1fr}
+      .bottom-nav{
+        width:calc(100vw - 18px);
+        bottom:8px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="app">
     <div class="shell">
-      <header class="topbar">
-        <div class="toprow">
-          <div class="brand">
-            <div class="brand-kicker">Household food operating system</div>
-            <div class="brand-row">
-              <div class="wordmark">Freezy</div>
-              <div class="context" id="contextLine">Inventory-first kitchen control</div>
-            </div>
+      <header class="app-header">
+        <div class="header-row">
+          <div class="header-copy">
+            <div class="eyebrow">Freezy household app</div>
+            <h1 class="header-title" id="pageTitle">Home</h1>
+            <p class="header-subtitle" id="pageSubtitle">Operational view of what is at home and what needs attention next.</p>
           </div>
-          <div class="top-actions">
+          <div class="header-actions">
             <div class="pill" id="locPill">Fridge</div>
-            <button class="icon-btn" id="shareBtn" title="Share list" aria-label="Share list">
+            <button class="icon-btn" id="shareBtn" aria-label="Share current list" title="Share current list">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <circle cx="18" cy="5" r="3"></circle>
                 <circle cx="6" cy="12" r="3"></circle>
@@ -894,31 +864,40 @@
             </button>
           </div>
         </div>
-        <div class="summary-bar" id="summaryBar"></div>
+        <div class="header-stats" id="headerStats"></div>
+        <div class="location-tabs">
+          <button class="location-tab active" data-loc="fridge">🧊 Fridge</button>
+          <button class="location-tab" data-loc="freezer">❄️ Freezer</button>
+          <button class="location-tab" data-loc="pantry">🥫 Pantry</button>
+        </div>
       </header>
 
-      <div class="segment-wrap">
-        <div class="segments">
-          <button class="segment active" data-loc="fridge">🧊 Fridge</button>
-          <button class="segment" data-loc="freezer">❄️ Freezer</button>
-          <button class="segment" data-loc="pantry">🥫 Pantry</button>
-        </div>
-      </div>
-
-      <main class="content" id="content"></main>
+      <main class="page-shell" id="pageShell"></main>
     </div>
   </div>
 
-  <div class="floating-cta">
-    <button class="fab" id="scanBtn">
-      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
-        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-        <circle cx="12" cy="13" r="4"></circle>
-      </svg>
-      Scan ${''}
-      <span id="scanLabel">Fridge</span>
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-btn active" data-page="home">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>
+      <span>Home</span>
     </button>
-  </div>
+    <button class="nav-btn" data-page="inventory">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="1"/><rect x="3" y="14" width="18" height="6" rx="1"/></svg>
+      <span>Inventory</span>
+    </button>
+    <button class="nav-btn scan" data-page="scan">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      <span>Scan</span>
+    </button>
+    <button class="nav-btn" data-page="planner">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"/><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+      <span>Planner</span>
+    </button>
+    <button class="nav-btn" data-page="settings">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-.4-1.1 1.7 1.7 0 0 0-1-.6 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H2.8a2 2 0 0 1 0-4h.1A1.7 1.7 0 0 0 4 9a1.7 1.7 0 0 0 .6-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.7 1.7 0 0 0 9 4.6c.39 0 .76-.22 1-.6a1.7 1.7 0 0 0 .4-1.1V2.8a2 2 0 0 1 4 0v.1c0 .4.14.78.4 1.1.24.38.61.6 1 .6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9c0 .39.22.76.6 1 .32.26.7.4 1.1.4h.1a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.1.4 1.7 1.7 0 0 0-.6 1z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
 
   <div class="overlay" id="captureOverlay">
     <div class="sheet">
@@ -931,7 +910,7 @@
       </button>
       <button class="capture-option" id="videoOpt">
         <strong>Guided multi-angle</strong>
-        <span>Capture a few angles to improve detection across containers, corners, and lower shelves.</span>
+        <span>Capture a few angles to improve detection across corners and stacked items.</span>
       </button>
     </div>
   </div>
@@ -947,10 +926,7 @@
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
         </button>
-        <div class="cam-pill" id="recBadge" style="display:none">
-          <span class="rec-dot"></span>
-          Multi-scan
-        </div>
+        <div class="cam-pill" id="recBadge" style="display:none"><span class="rec-dot"></span>Multi-scan</div>
         <div style="width:44px"></div>
       </div>
       <div class="cam-bottom">
@@ -965,9 +941,7 @@
 
   <div class="analyzing" id="analyzingOverlay">
     <div class="analyze-card">
-      <div class="spinner">
-        <div class="spinner-mark" id="spinEmoji">🧊</div>
-      </div>
+      <div class="spinner"><div class="spinner-mark" id="spinEmoji">🧊</div></div>
       <h2 class="analyze-title">Reviewing the shelf</h2>
       <p class="analyze-copy">Freezy is identifying visible items, grouping them into inventory, and preparing next actions.</p>
       <div class="chip">Estimated freshness • visible evidence</div>
@@ -982,31 +956,36 @@
     const MAX_MULTI_SCAN_FRAMES=5;
     const MULTI_SCAN_INTERVAL_MS=900;
     const VALID_LOCS=['fridge','freezer','pantry'];
+    const PAGE_META={
+      home:{title:'Home',subtitle:'Operational view of what is at home and what needs attention next.'},
+      inventory:{title:'Inventory',subtitle:'The system-of-record for what is in this location right now.'},
+      planner:{title:'Planner',subtitle:'Turn inventory into meals, use-soon decisions, and restocking.'},
+      settings:{title:'Settings',subtitle:'Household preferences, trust settings, and scan behavior.'}
+    };
     const LOC_META={
       fridge:{label:'Fridge',emoji:'🧊',context:'Produce, dairy, condiments, and ready-to-use ingredients.'},
       freezer:{label:'Freezer',emoji:'❄️',context:'Longer-hold proteins, frozen staples, and meal backups.'},
-      pantry:{label:'Pantry',emoji:'🥫',context:'Shelf-stable goods, grains, snacks, and household staples.'}
+      pantry:{label:'Pantry',emoji:'🥫',context:'Shelf-stable goods, grains, snacks, and staples.'}
     };
 
     const $=id=>document.getElementById(id);
-    const content=$('content');
-    const summaryBar=$('summaryBar');
+    const pageShell=$('pageShell');
+    const headerStats=$('headerStats');
+    const pageTitle=$('pageTitle');
+    const pageSubtitle=$('pageSubtitle');
+    const locPill=$('locPill');
+    const shareBtn=$('shareBtn');
     const captureOverlay=$('captureOverlay');
     const cameraModal=$('cameraModal');
     const analyzingOverlay=$('analyzingOverlay');
     const videoEl=$('videoEl');
     const canvas=$('captureCanvas');
-    const toast=$('toast');
     const recBadge=$('recBadge');
     const shutterBtn=$('shutterBtn');
-    const camHint=$('camHint');
     const camTitle=$('camTitle');
-    const locPill=$('locPill');
+    const camHint=$('camHint');
     const spinEmoji=$('spinEmoji');
-    const scanBtn=$('scanBtn');
-    const scanLabel=$('scanLabel');
-    const shareBtn=$('shareBtn');
-    const contextLine=$('contextLine');
+    const toast=$('toast');
 
     function defaultLocationData(){ return {cats:{},shopping:[],preview:null,lastScanAt:null}; }
     function defaultData(){ return {fridge:defaultLocationData(),freezer:defaultLocationData(),pantry:defaultLocationData()}; }
@@ -1050,7 +1029,11 @@
       const base=defaultData();
       const incoming=raw&&typeof raw==='object'?raw:{};
       VALID_LOCS.forEach(loc=>{ base[loc]=normalizeLocationData(incoming.data?.[loc]); });
-      return { loc:VALID_LOCS.includes(incoming.loc)?incoming.loc:'fridge', data:base };
+      return {
+        loc:VALID_LOCS.includes(incoming.loc)?incoming.loc:'fridge',
+        page:['home','inventory','planner','settings'].includes(incoming.page)?incoming.page:'home',
+        data:base
+      };
     }
 
     function loadState(){
@@ -1060,10 +1043,11 @@
       }catch{ return normalizeAppState(null); }
     }
 
-    const storedState=loadState();
+    const stored=loadState();
     const state={
-      loc:storedState.loc,
-      data:storedState.data,
+      loc:stored.loc,
+      page:stored.page,
+      data:stored.data,
       captureMode:'photo',
       stream:null,
       isRecording:false,
@@ -1075,7 +1059,7 @@
     function curData(){ return state.data[state.loc]; }
 
     function persistState(){
-      const payload={loc:state.loc,data:state.data};
+      const payload={loc:state.loc,page:state.page,data:state.data};
       try{
         localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));
         return true;
@@ -1125,45 +1109,297 @@
       if((has('spinach')||has('lettuce'))&&(has('chicken')||has('salmon'))) out.push({name:'Protein salad',meta:'Good use for produce that should move this week.'});
       if(has('tomato')&&has('pasta')) out.push({name:'Red sauce pasta',meta:'Turns pantry goods into a low-effort dinner.'});
       if(has('rice')&&(has('shrimp')||has('chicken')||has('vegetable'))) out.push({name:'Fried rice',meta:'Useful for mixed leftovers and quick shelf cleanup.'});
-      if(!out.length){
-        out.push({name:'Use-soon dinner',meta:'Scan more shelves or add manual items to unlock stronger matches.'});
-      }
-      return out.slice(0,2);
+      if(!out.length) out.push({name:'Use-soon dinner',meta:'Scan more shelves or add manual items to unlock stronger matches.'});
+      return out.slice(0,3);
     }
 
     function activitySummary(d){
       const items=Object.values(d.cats).flat();
       const soonItems=items.filter(item=>item.expiry_concern!=='none').slice(0,2).map(item=>item.name);
-      const out=[];
-      out.push({title:`Last verified ${lastScanLabel(d)}`,meta:'Camera evidence is the current inventory source.'});
+      const out=[{title:`Latest scan ${lastScanLabel(d)}`,meta:'Visible evidence is the current inventory source.'}];
       if(soonItems.length) out.push({title:'Use-soon watch',meta:soonItems.join(' • ')});
       if(d.shopping.length) out.push({title:'Shopping queue active',meta:`${d.shopping.length} item${d.shopping.length===1?'':'s'} waiting for restock.`});
-      return out.slice(0,3);
+      return out;
     }
 
-    function updateLocUI(){
-      document.querySelectorAll('.segment').forEach(tab=>tab.classList.toggle('active',tab.dataset.loc===state.loc));
+    function escHtml(s){
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function enc(value){ return encodeURIComponent(value); }
+    function dec(value){ return decodeURIComponent(value); }
+
+    function renderHeader(){
+      const d=curData();
+      const stats=summarizeInventory(d);
+      const meta=PAGE_META[state.page] || PAGE_META.home;
+      pageTitle.textContent=meta.title;
+      pageSubtitle.textContent=meta.subtitle;
       locPill.textContent=LOC_META[state.loc].label;
-      scanLabel.textContent=LOC_META[state.loc].label;
-      contextLine.textContent=LOC_META[state.loc].context;
       spinEmoji.textContent=LOC_META[state.loc].emoji;
-      scanBtn.disabled=state.isAnalyzing;
+      headerStats.innerHTML=`
+        <div class="stat"><span>Status</span><strong>${stats.urgent?`${stats.urgent} first`:stats.soon?`${stats.soon} soon`:stats.total?'steady':'ready'}</strong><p>${stats.total?`verified ${lastScanLabel(d)}`:'run a scan to begin'}</p></div>
+        <div class="stat"><span>Items</span><strong>${stats.total}</strong><p>tracked</p></div>
+        <div class="stat"><span>Shopping</span><strong>${stats.shopping}</strong><p>queued</p></div>
+      `;
+      document.querySelectorAll('.location-tab').forEach(tab=>tab.classList.toggle('active',tab.dataset.loc===state.loc));
+      document.querySelectorAll('.nav-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.page===state.page));
     }
 
-    function renderSummary(stats,d){
+    function renderHomePage(){
+      const d=curData();
+      const stats=summarizeInventory(d);
+      const recipes=recipeSuggestions(d);
+      const activity=activitySummary(d);
       const lead=stats.urgent
-        ? `${stats.urgent} item${stats.urgent===1?'':'s'} first`
+        ? `${stats.urgent} item${stats.urgent===1?'':'s'} should move first.`
         : stats.soon
-          ? `${stats.soon} item${stats.soon===1?'':'s'} soon`
+          ? `${stats.soon} item${stats.soon===1?'':'s'} deserve attention this week.`
           : stats.total
-            ? 'Stable today'
-            : 'Ready to scan';
-      summaryBar.innerHTML=`
-        <div class="summary-card"><span>status</span><strong>${lead}</strong><p>${stats.total?`Verified ${lastScanLabel(d)}`:'Create a baseline for this location.'}</p></div>
-        <div class="summary-card"><span>items</span><strong>${stats.total}</strong><p>tracked</p></div>
-        <div class="summary-card"><span>use soon</span><strong>${stats.soon + stats.urgent}</strong><p>need attention</p></div>
-        <div class="summary-card"><span>shopping</span><strong>${stats.shopping}</strong><p>queued</p></div>
+            ? `${LOC_META[state.loc].label} inventory looks steady right now.`
+            : `No ${state.loc} record yet.`;
+      return `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Overview</div>
+              <h2 class="panel-title">${LOC_META[state.loc].label} dashboard</h2>
+              <p class="panel-copy">${lead}</p>
+            </div>
+            <div class="mini-stat"><strong>${stats.total}</strong><span>items</span></div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <strong>Next best action</strong>
+              <p>${stats.total?'Refresh after a grocery run or when major items move.':'Start with a shelf scan to establish the inventory baseline.'}</p>
+              <div class="meta-row"><div class="chip">source • scan</div><div class="chip">freshness • estimated</div></div>
+            </div>
+            <div class="card">
+              <strong>Kitchen context</strong>
+              <p>${LOC_META[state.loc].context}</p>
+            </div>
+          </div>
+        </section>
+        <section class="panel evidence">
+          <div class="evidence-shell">
+            <div class="evidence-media">
+              ${d.preview?`<img src="${d.preview}" alt="Last scan evidence">`:`<div class="evidence-fallback">${LOC_META[state.loc].emoji}</div>`}
+            </div>
+            <div class="evidence-main">
+              <div class="evidence-title">${d.preview?'Latest evidence on file':'No evidence captured yet'}</div>
+              <div class="evidence-copy">${d.preview?`Verified ${lastScanLabel(d)} from a ${state.loc} scan.`:'Capture a shelf and Freezy will create a visual record for inventory and planning.'}</div>
+              <div class="meta-row"><div class="chip">${d.preview?'camera verified':'awaiting first scan'}</div><div class="chip">visible evidence only</div></div>
+            </div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Signals</div>
+              <h2 class="panel-title">What needs attention</h2>
+            </div>
+          </div>
+          <div class="compact-list">
+            ${activity.map(entry=>`
+              <div class="row">
+                <div class="row-main">
+                  <div class="row-title">${escHtml(entry.title)}</div>
+                  <div class="row-meta">${escHtml(entry.meta)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Cook</div>
+              <h2 class="panel-title">Tonight ideas</h2>
+            </div>
+          </div>
+          <div class="compact-list">
+            ${recipes.map(recipe=>`
+              <div class="row">
+                <div class="row-main">
+                  <div class="row-title">${escHtml(recipe.name)}</div>
+                  <div class="row-meta">${escHtml(recipe.meta)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
       `;
+    }
+
+    function renderInventoryPage(){
+      const d=curData();
+      const cats=Object.keys(d.cats).sort();
+      if(!cats.length){
+        return `
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="section-label">Inventory</div>
+                <h2 class="panel-title">No confirmed items</h2>
+                <p class="panel-copy">Use Scan from the bottom nav to establish the record, then edit items here.</p>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+      return `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Inventory</div>
+              <h2 class="panel-title">${LOC_META[state.loc].label} record</h2>
+              <p class="panel-copy">This is the system-of-record for the current location.</p>
+            </div>
+            <div class="mini-stat"><strong>${Object.values(d.cats).flat().length}</strong><span>tracked</span></div>
+          </div>
+          ${cats.map(cat=>{
+            const catKey=cat.replace(/[^a-z0-9]/gi,'_');
+            return `
+              <div class="inventory-group">
+                <div class="inventory-group-head">
+                  <div class="inventory-group-title"><span class="dot"></span>${escHtml(cat)}</div>
+                  <div class="count">${d.cats[cat].length} item${d.cats[cat].length===1?'':'s'}</div>
+                </div>
+                ${d.cats[cat].map((item,idx)=>{
+                  const freshness=item.expiry_concern==='urgent'
+                    ? '<span class="status-chip urgent">use first</span>'
+                    : item.expiry_concern==='soon'
+                      ? '<span class="status-chip soon">use soon</span>'
+                      : '<span class="status-chip fresh">steady</span>';
+                  return `
+                    <div class="row">
+                      <div class="row-mark">${escHtml(item.emoji||'🍽️')}</div>
+                      <div class="row-main">
+                        <div class="row-title">${escHtml(item.name)}</div>
+                        <div class="row-meta">
+                          ${item.quantity?`<span>${escHtml(item.quantity)}</span>`:'<span>Quantity not refined</span>'}
+                          <span>Estimated from visible evidence</span>
+                        </div>
+                        <div class="status-row">
+                          ${freshness}
+                          <span class="status-chip neutral">${escHtml(cat)}</span>
+                        </div>
+                      </div>
+                      <button class="ghost-btn" data-action="delete-item" data-cat="${enc(cat)}" data-idx="${idx}" aria-label="Delete ${escHtml(item.name)}">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                          <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                      </button>
+                    </div>
+                  `;
+                }).join('')}
+                <button class="add-row" id="addrow_${catKey}" data-action="show-add" data-cat="${enc(cat)}" data-cat-key="${catKey}">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                  Add to ${escHtml(cat)}
+                </button>
+              </div>
+            `;
+          }).join('')}
+        </section>
+      `;
+    }
+
+    function renderPlannerPage(){
+      const d=curData();
+      const stats=summarizeInventory(d);
+      const recipes=recipeSuggestions(d);
+      return `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Planner</div>
+              <h2 class="panel-title">Use, cook, restock</h2>
+              <p class="panel-copy">${stats.soon + stats.urgent ? `${stats.soon + stats.urgent} item${stats.soon + stats.urgent===1?'':'s'} need attention soon.` : 'No visible urgency. Planning is ready when inventory changes.'}</p>
+            </div>
+            <div class="mini-stat"><strong>${stats.shopping}</strong><span>shopping</span></div>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <strong>Use soon</strong>
+              <p>${stats.urgent?`${stats.urgent} item${stats.urgent===1?'':'s'} should move immediately.`:stats.soon?`${stats.soon} item${stats.soon===1?'':'s'} should be used this week.`:'Nothing urgent is visible right now.'}</p>
+            </div>
+            <div class="card">
+              <strong>Shopping state</strong>
+              <p>${stats.shopping?`${stats.shopping} restock cue${stats.shopping===1?'':'s'} are waiting.`:'No shopping items are queued yet.'}</p>
+            </div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Cook tonight</div>
+              <h2 class="panel-title">Recipe suggestions</h2>
+            </div>
+          </div>
+          <div class="compact-list">
+            ${recipes.map(recipe=>`
+              <div class="row">
+                <div class="row-main">
+                  <div class="row-title">${escHtml(recipe.name)}</div>
+                  <div class="row-meta">${escHtml(recipe.meta)}</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Shopping</div>
+              <h2 class="panel-title">Current list</h2>
+            </div>
+          </div>
+          <div class="compact-list">
+            ${d.shopping.length ? d.shopping.map((item,i)=>`
+              <div class="row" id="shoprow_${i}">
+                <div class="row-mark">${escHtml(item.emoji||'🛒')}</div>
+                <div class="row-main">
+                  <div class="row-title">${escHtml(item.name)}</div>
+                  <div class="row-meta">Household restock cue</div>
+                </div>
+                <button class="ghost-btn" data-action="delete-shop" data-idx="${i}" aria-label="Delete ${escHtml(item.name)}">×</button>
+              </div>
+            `).join('') : `<div class="row"><div class="row-main"><div class="row-title">No active shopping items</div><div class="row-meta">Freezy will suggest likely gaps once the inventory record is richer.</div></div></div>`}
+          </div>
+        </section>
+      `;
+    }
+
+    function renderSettingsPage(){
+      const d=curData();
+      return `
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="section-label">Settings</div>
+              <h2 class="panel-title">Household defaults</h2>
+              <p class="panel-copy">These are product placeholders now, but this page gives the app a real multi-page shape instead of a single screen.</p>
+            </div>
+          </div>
+          <div class="settings-list">
+            <div class="settings-row"><div><strong>Current location</strong><span>${LOC_META[state.loc].label}</span></div><div class="chip">active</div></div>
+            <div class="settings-row"><div><strong>Scan evidence retention</strong><span>${d.preview?'Last preview stored locally':'No preview stored yet'}</span></div><div class="chip">local</div></div>
+            <div class="settings-row"><div><strong>Freshness language</strong><span>Estimated from visible evidence, not certainty.</span></div><div class="chip">trust-first</div></div>
+            <div class="settings-row"><div><strong>Capture mode</strong><span>Quick photo and guided multi-angle are available from the Scan tab.</span></div><div class="chip">camera</div></div>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderPage(){
+      if(state.page==='inventory') return renderInventoryPage();
+      if(state.page==='planner') return renderPlannerPage();
+      if(state.page==='settings') return renderSettingsPage();
+      return renderHomePage();
+    }
+
+    function render(){
+      renderHeader();
+      pageShell.innerHTML=renderPage();
     }
 
     function syncBodyLock(){
@@ -1174,11 +1410,19 @@
       );
     }
 
-    function closeCaptureModal(){ captureOverlay.classList.remove('open'); syncBodyLock(); }
-    function openCaptureModal(){ if(!state.isAnalyzing){ captureOverlay.classList.add('open'); syncBodyLock(); } }
+    function showToast(msg,ms=2800){
+      clearTimeout(showToast.timer);
+      toast.textContent=msg;
+      toast.classList.add('show');
+      showToast.timer=setTimeout(()=>toast.classList.remove('show'),ms);
+    }
+    showToast.timer=null;
 
     function clearCaptureInterval(){
-      if(state.captureIntervalId){ clearInterval(state.captureIntervalId); state.captureIntervalId=null; }
+      if(state.captureIntervalId){
+        clearInterval(state.captureIntervalId);
+        state.captureIntervalId=null;
+      }
     }
 
     function resetCameraState(){
@@ -1187,6 +1431,17 @@
       shutterBtn.classList.remove('rec');
       state.isRecording=false;
       state.captureFrames=[];
+    }
+
+    function closeCaptureModal(){
+      captureOverlay.classList.remove('open');
+      syncBodyLock();
+    }
+
+    function openCaptureModal(){
+      if(state.isAnalyzing)return;
+      captureOverlay.classList.add('open');
+      syncBodyLock();
     }
 
     function stopCamera(){
@@ -1204,270 +1459,7 @@
     function setAnalyzing(isAnalyzing){
       state.isAnalyzing=isAnalyzing;
       analyzingOverlay.classList.toggle('open',isAnalyzing);
-      scanBtn.disabled=isAnalyzing;
       syncBodyLock();
-    }
-
-    function renderOpsPanel(d,stats){
-      const leadText=stats.urgent
-        ? `${stats.urgent} item${stats.urgent===1?'':'s'} should move first.`
-        : stats.soon
-          ? `${stats.soon} item${stats.soon===1?'':'s'} deserve attention this week.`
-          : stats.total
-            ? `${LOC_META[state.loc].label} inventory looks steady right now.`
-            : `No ${state.loc} record yet.`;
-      const recipe=recipeSuggestions(d)[0];
-      const shoppingText=d.shopping.length
-        ? `${d.shopping.length} restock cue${d.shopping.length===1?'':'s'} waiting.`
-        : 'No active restock cues yet.';
-      return `
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="section-label">Operational overview</div>
-              <h2 class="panel-title">${LOC_META[state.loc].label} dashboard</h2>
-              <p class="panel-copy">Inventory is the main surface. Scan, verify, adjust, and act without wading through marketing copy.</p>
-            </div>
-            <div class="tiny-stat"><strong>${stats.total}</strong><span>items</span></div>
-          </div>
-          <div class="operational-grid">
-            <div class="brief-card">
-              <strong>${leadText}</strong>
-              <p>${stats.total ? `Latest evidence was verified ${lastScanLabel(d)}.` : 'Run a quick scan or guided multi-angle capture to build the initial record.'}</p>
-              <div class="meta-row">
-                <div class="chip">source • scan</div>
-                <div class="chip">freshness • estimated</div>
-              </div>
-            </div>
-            <div class="scan-card">
-              <strong>Next best action</strong>
-              <p>${stats.total ? 'Refresh the shelf after a grocery run or when major items move.' : 'Start with a shelf scan to establish the inventory baseline.'}</p>
-            </div>
-            <div class="recipe-card">
-              <strong>${escHtml(recipe.name)}</strong>
-              <p>${escHtml(recipe.meta)}</p>
-            </div>
-            <div class="shop-card">
-              <strong>Shopping state</strong>
-              <p>${shoppingText}</p>
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-    function renderEvidencePanel(d){
-      const media=d.preview
-        ? `<img src="${d.preview}" alt="Last scan evidence">`
-        : `<div class="evidence-fallback">${LOC_META[state.loc].emoji}</div>`;
-      return `
-        <section class="panel evidence">
-          <div class="evidence-shell">
-            <div class="evidence-media">${media}</div>
-            <div class="evidence-main">
-              <div class="evidence-title">${d.preview?'Latest evidence on file':'No evidence captured yet'}</div>
-              <div class="evidence-copy">${d.preview?`Verified ${lastScanLabel(d)} from a ${state.loc} scan.`:'Capture a shelf and Freezy will create a visual record for inventory and planning.'}</div>
-              <div class="meta-row">
-                <div class="chip">${d.preview?'camera verified':'awaiting first scan'}</div>
-                <div class="chip">visible evidence only</div>
-              </div>
-            </div>
-          </div>
-        </section>
-      `;
-    }
-
-    function renderInventory(d){
-      const cats=Object.keys(d.cats).sort();
-      if(!cats.length){
-        return `
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <div class="section-label">Inventory</div>
-                <h2 class="panel-title">No confirmed items</h2>
-                <p class="panel-copy">The first scan establishes the record. After that, you can add, remove, and share items with confidence.</p>
-              </div>
-            </div>
-          </section>
-        `;
-      }
-
-      const categories=cats.map(cat=>{
-        const catKey=cat.replace(/[^a-z0-9]/gi,'_');
-        const rows=d.cats[cat].map((item,idx)=>{
-          const freshness=item.expiry_concern==='urgent'
-            ? '<span class="status-chip urgent">use first</span>'
-            : item.expiry_concern==='soon'
-              ? '<span class="status-chip soon">use soon</span>'
-              : '<span class="status-chip fresh">steady</span>';
-          return `
-            <div class="item-row">
-              <div class="item-mark">${escHtml(item.emoji||'🍽️')}</div>
-              <div class="item-main">
-                <div class="item-name">${escHtml(item.name)}</div>
-                <div class="item-meta">
-                  ${item.quantity?`<span>${escHtml(item.quantity)}</span>`:'<span>Quantity not refined</span>'}
-                  <span>Estimated from visible evidence</span>
-                </div>
-                <div class="status-row">
-                  ${freshness}
-                  <span class="status-chip neutral">${escHtml(cat)}</span>
-                </div>
-              </div>
-              <button class="ghost-btn" data-action="delete-item" data-cat="${enc(cat)}" data-idx="${idx}" aria-label="Delete ${escHtml(item.name)}">
-                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
-          `;
-        }).join('');
-        return `
-          <div class="category">
-            <div class="category-head">
-              <div class="category-title"><span class="dot"></span>${escHtml(cat)}</div>
-              <div class="count">${d.cats[cat].length} item${d.cats[cat].length===1?'':'s'}</div>
-            </div>
-            ${rows}
-            <button class="add-row" id="addrow_${catKey}" data-action="show-add" data-cat="${enc(cat)}" data-cat-key="${catKey}">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Add to ${escHtml(cat)}
-            </button>
-          </div>
-        `;
-      }).join('');
-
-      return `
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="section-label">Inventory</div>
-              <h2 class="panel-title">${LOC_META[state.loc].label} record</h2>
-              <p class="panel-copy">This is the operational core. Everything else should orbit around an accurate inventory state.</p>
-            </div>
-            <div class="tiny-stat"><strong>${Object.values(d.cats).flat().length}</strong><span>tracked</span></div>
-          </div>
-          <div class="inventory-stack">${categories}</div>
-        </section>
-      `;
-    }
-
-    function renderPlanning(d,stats){
-      const recipeRows=recipeSuggestions(d).map(recipe=>`
-        <div class="compact-row">
-          <div class="compact-main">
-            <div class="compact-title">${escHtml(recipe.name)}</div>
-            <div class="compact-meta">${escHtml(recipe.meta)}</div>
-          </div>
-        </div>
-      `).join('');
-
-      const shoppingRows=d.shopping.length
-        ? d.shopping.map((item,i)=>`
-            <div class="compact-row" id="shoprow_${i}">
-              <div class="check" id="shopchk_${i}" data-action="toggle-shop" data-idx="${i}"></div>
-              <div class="compact-main">
-                <div class="compact-title">${escHtml(item.name)}</div>
-                <div class="compact-meta">Household restock cue</div>
-              </div>
-              <button class="ghost-btn" data-action="delete-shop" data-idx="${i}" aria-label="Delete ${escHtml(item.name)}">×</button>
-            </div>
-          `).join('')
-        : `<div class="compact-row"><div class="compact-main"><div class="compact-title">No active shopping items</div><div class="compact-meta">Freezy will suggest likely gaps once the inventory record is richer.</div></div></div>`;
-
-      return `
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="section-label">Planning</div>
-              <h2 class="panel-title">Use, cook, restock</h2>
-              <p class="panel-copy">${stats.soon + stats.urgent ? `${stats.soon + stats.urgent} item${stats.soon + stats.urgent===1?'':'s'} need attention soon.` : 'No visible urgency. Planning is ready when inventory changes.'}</p>
-            </div>
-            <div class="tiny-stat"><strong>${stats.shopping}</strong><span>shopping</span></div>
-          </div>
-          <div class="compact-list">${recipeRows}</div>
-          <div class="compact-list">${shoppingRows}</div>
-        </section>
-      `;
-    }
-
-    function renderSignals(d){
-      const rows=activitySummary(d).map(entry=>`
-        <div class="compact-row">
-          <div class="compact-main">
-            <div class="compact-title">${escHtml(entry.title)}</div>
-            <div class="compact-meta">${escHtml(entry.meta)}</div>
-          </div>
-        </div>
-      `).join('');
-      return `
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <div class="section-label">Signals</div>
-              <h2 class="panel-title">Quiet trust cues</h2>
-              <p class="panel-copy">The product should look premium because it is disciplined, not because it is loud.</p>
-            </div>
-          </div>
-          <div class="compact-list">${rows}</div>
-        </section>
-      `;
-    }
-
-    function render(){
-      const d=curData();
-      const stats=summarizeInventory(d);
-      renderSummary(stats,d);
-      content.innerHTML=
-        renderOpsPanel(d,stats)+
-        renderEvidencePanel(d)+
-        renderInventory(d)+
-        renderPlanning(d,stats)+
-        renderSignals(d);
-    }
-
-    document.querySelectorAll('.segment').forEach(tab=>{
-      tab.addEventListener('click',()=>{
-        if(state.isAnalyzing)return;
-        state.loc=tab.dataset.loc;
-        persistState();
-        updateLocUI();
-        render();
-      });
-    });
-
-    scanBtn.addEventListener('click',openCaptureModal);
-    shareBtn.addEventListener('click',shareList);
-    captureOverlay.addEventListener('click',e=>{ if(e.target===captureOverlay)closeCaptureModal(); });
-    $('photoOpt').addEventListener('click',()=>{ closeCaptureModal(); state.captureMode='photo'; startCamera(); });
-    $('videoOpt').addEventListener('click',()=>{ closeCaptureModal(); state.captureMode='multi'; startCamera(); });
-    $('camClose').addEventListener('click',stopCamera);
-
-    async function startCamera(){
-      if(state.isAnalyzing)return;
-      if(!navigator.mediaDevices?.getUserMedia){ showToast('Camera is not supported on this device'); return; }
-      resetCameraState();
-      try{
-        state.stream=await navigator.mediaDevices.getUserMedia({
-          video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
-          audio:false
-        });
-        videoEl.srcObject=state.stream;
-        camTitle.textContent=state.captureMode==='photo'?'Capture a clean shelf':'Sweep the shelf gently';
-        camHint.textContent=state.captureMode==='photo'
-          ? `Point at the ${state.loc} and take one clear frame.`
-          : 'Tap once to begin a guided multi-angle capture.';
-        cameraModal.classList.add('open');
-        syncBodyLock();
-      }catch(err){
-        console.error(err);
-        showToast('Camera access denied');
-      }
     }
 
     function captureCurrentFrame({quality=.72,previewQuality=.32}={}){
@@ -1524,11 +1516,27 @@
       analyzeScan({images,preview});
     }
 
-    shutterBtn.addEventListener('click',()=>{
-      if(state.captureMode==='photo'){ captureSingleScan(); return; }
-      if(!state.isRecording){ startMultiScan(); return; }
-      finishMultiScan();
-    });
+    async function startCamera(){
+      if(state.isAnalyzing)return;
+      if(!navigator.mediaDevices?.getUserMedia){ showToast('Camera is not supported on this device'); return; }
+      resetCameraState();
+      try{
+        state.stream=await navigator.mediaDevices.getUserMedia({
+          video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},
+          audio:false
+        });
+        videoEl.srcObject=state.stream;
+        camTitle.textContent=state.captureMode==='photo'?'Capture a clean shelf':'Sweep the shelf gently';
+        camHint.textContent=state.captureMode==='photo'
+          ? `Point at the ${state.loc} and take one clear frame.`
+          : 'Tap once to begin a guided multi-angle capture.';
+        cameraModal.classList.add('open');
+        syncBodyLock();
+      }catch(err){
+        console.error(err);
+        showToast('Camera access denied');
+      }
+    }
 
     async function analyzeScan({images,preview}){
       if(!Array.isArray(images)||!images.length)return;
@@ -1543,16 +1551,13 @@
           body:JSON.stringify({images,location:loc}),
           signal:controller.signal
         });
-
         let parsedBody=null;
         try{ parsedBody=await res.json(); }catch{ parsedBody=null; }
-
         if(!res.ok){
           const errMsg=parsedBody?.detail||parsedBody?.error||`Error ${res.status}`;
           showToast(errMsg);
           return;
         }
-
         const d=state.data[loc];
         d.preview=preview;
         d.lastScanAt=new Date().toISOString();
@@ -1566,6 +1571,7 @@
         });
         persistState();
         if(!items.length)showToast('No clear items found. Try better light or another angle.');
+        state.page='inventory';
         render();
       }catch(err){
         console.error('Analyze error:',err);
@@ -1609,15 +1615,6 @@
       render();
     }
 
-    function toggleShop(i){
-      const chk=document.getElementById('shopchk_'+i);
-      const row=document.getElementById('shoprow_'+i);
-      if(!chk)return;
-      const on=chk.classList.toggle('checked');
-      chk.innerHTML=on?`<svg width="10" height="10" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`:'';
-      if(row)row.style.opacity=on?'.45':'1';
-    }
-
     function deleteShop(i){
       curData().shopping.splice(i,1);
       persistState();
@@ -1653,28 +1650,43 @@
       }catch{ showToast('Could not share list'); }
     }
 
-    function showToast(msg,ms=2800){
-      clearTimeout(showToast.timer);
-      toast.textContent=msg;
-      toast.classList.add('show');
-      showToast.timer=setTimeout(()=>toast.classList.remove('show'),ms);
-    }
-    showToast.timer=null;
+    document.querySelectorAll('.location-tab').forEach(tab=>{
+      tab.addEventListener('click',()=>{
+        if(state.isAnalyzing)return;
+        state.loc=tab.dataset.loc;
+        persistState();
+        render();
+      });
+    });
 
-    function escHtml(s){
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function enc(value){ return encodeURIComponent(value); }
-    function dec(value){ return decodeURIComponent(value); }
+    document.querySelectorAll('.nav-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const page=btn.dataset.page;
+        if(page==='scan'){ openCaptureModal(); return; }
+        state.page=page;
+        persistState();
+        render();
+      });
+    });
 
-    content.addEventListener('click',e=>{
+    shareBtn.addEventListener('click',shareList);
+    captureOverlay.addEventListener('click',e=>{ if(e.target===captureOverlay)closeCaptureModal(); });
+    $('photoOpt').addEventListener('click',()=>{ closeCaptureModal(); state.captureMode='photo'; startCamera(); });
+    $('videoOpt').addEventListener('click',()=>{ closeCaptureModal(); state.captureMode='multi'; startCamera(); });
+    $('camClose').addEventListener('click',stopCamera);
+    shutterBtn.addEventListener('click',()=>{
+      if(state.captureMode==='photo'){ captureSingleScan(); return; }
+      if(!state.isRecording){ startMultiScan(); return; }
+      finishMultiScan();
+    });
+
+    pageShell.addEventListener('click',e=>{
       const el=e.target.closest('[data-action]');
       if(!el)return;
       const action=el.dataset.action;
       if(action==='delete-item')deleteItem(dec(el.dataset.cat),Number(el.dataset.idx));
       if(action==='show-add')showAddInput(dec(el.dataset.cat),el.dataset.catKey);
       if(action==='confirm-add')confirmAdd(dec(el.dataset.cat),el.dataset.catKey);
-      if(action==='toggle-shop')toggleShop(Number(el.dataset.idx));
       if(action==='delete-shop')deleteShop(Number(el.dataset.idx));
     });
 
@@ -1685,7 +1697,6 @@
       }
     });
 
-    updateLocUI();
     render();
   </script>
 </body>
